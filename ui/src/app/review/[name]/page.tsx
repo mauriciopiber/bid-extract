@@ -243,6 +243,55 @@ function SummaryView({ data }: { data: Record<string, unknown> }) {
   );
 }
 
+function LegacyView({ data, pdfName }: { data: Record<string, unknown>; pdfName: string }) {
+  const bidders = (data.bidders as { rank: number; name: string; totalBaseBid?: number; address?: string; lineItems?: { itemNo: string; description: string; extendedPrice?: number }[] }[]) ?? [];
+  const project = data.project as Record<string, string> | undefined;
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="flex" style={{ height: 700 }}>
+        <div className="w-1/2 border-r border-gray-200 overflow-auto">
+          <iframe src={`/api/pdf/${pdfName}`} className="w-full h-full" title="PDF" />
+        </div>
+        <div className="w-1/2 overflow-y-auto p-4">
+          {project?.name && (
+            <div className="mb-4">
+              <div className="font-bold text-lg">{project.name}</div>
+              {project.owner && <div className="text-sm text-gray-500">{project.owner}</div>}
+              {project.bidDate && <div className="text-sm text-gray-500">{project.bidDate}</div>}
+            </div>
+          )}
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-gray-50 text-left text-xs text-gray-500">
+                <th className="px-3 py-2">Rank</th>
+                <th className="px-3 py-2">Bidder</th>
+                <th className="px-3 py-2 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bidders.map((b, i) => (
+                <tr key={i} className="border-t border-gray-100">
+                  <td className="px-3 py-2">
+                    <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-xs">#{b.rank}</span>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="font-medium">{b.name}</div>
+                    {b.address && <div className="text-xs text-gray-400">{b.address}</div>}
+                  </td>
+                  <td className="px-3 py-2 text-right text-green-600 font-bold">
+                    {formatMoney(b.totalBaseBid)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ReviewPage() {
   const params = useParams();
   const name = params.name as string;
@@ -251,14 +300,13 @@ export default function ReviewPage() {
   const [evalData, setEvalData] = useState<EvalData | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [sourceFile, setSourceFile] = useState("");
+  const [fullData, setFullData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    // Load per-page data
     fetch(`/api/extractions/${name}/pages`)
       .then((r) => r.json())
       .then(setPages);
 
-    // Load extraction metadata
     fetch(`/api/extractions/${name}`)
       .then((r) => r.json())
       .then((d) => {
@@ -266,6 +314,7 @@ export default function ReviewPage() {
         setEvalData(d._eval);
         setLogs(d._logs ?? []);
         setSourceFile(d.sourceFile ?? "");
+        setFullData(d);
       });
   }, [name]);
 
@@ -319,9 +368,12 @@ export default function ReviewPage() {
           />
         ))}
 
-        {pages.length === 0 && (
+        {pages.length === 0 && fullData && (
+          <LegacyView data={fullData} pdfName={pdfName} />
+        )}
+        {pages.length === 0 && !fullData && (
           <div className="text-center text-gray-400 py-12">
-            Loading pages...
+            Loading...
           </div>
         )}
       </div>
