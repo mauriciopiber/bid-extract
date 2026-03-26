@@ -278,13 +278,13 @@ export default function ReviewPage() {
 
       {/* Split view: PDF left, data right */}
       <div className="flex-1 flex">
-        {/* PDF */}
-        <div className="w-1/2 border-r">
+        {/* PDF — single page image */}
+        <div className="w-1/2 border-r overflow-auto bg-muted/30">
           {pdfName && page && (
-            <iframe
-              src={`/api/pdf/${pdfName}#page=${page.pageNumber}`}
-              className="w-full h-full"
-              title={`Page ${page?.pageNumber}`}
+            <img
+              src={`/api/pdf-page/${pdfName}/${page.pageNumber}`}
+              alt={`Page ${page.pageNumber}`}
+              className="w-full"
             />
           )}
           {!page && pdfName && (
