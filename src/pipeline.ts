@@ -372,6 +372,20 @@ function mergePageResults(
 		}
 	}
 
+	// Copy bid group totals to bidder totalBaseBid
+	for (const contract of contracts) {
+		for (const group of contract.bidGroups) {
+			if (group.totals) {
+				for (const [name, total] of Object.entries(group.totals)) {
+					const bidder = bidderMap.get(name);
+					if (bidder && !bidder.totalBaseBid) {
+						bidder.totalBaseBid = total;
+					}
+				}
+			}
+		}
+	}
+
 	const bidders = Array.from(bidderMap.values()).sort(
 		(a, b) => a.rank - b.rank,
 	);
