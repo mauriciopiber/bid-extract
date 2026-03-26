@@ -44,7 +44,9 @@ export const extractAction = createAction({
 				console.log(`[${results.length + 1}/${pdfFiles.length}] ${name}`);
 				const result = await runPipeline(pdfPath, input.maxCorrections);
 
-				const lineItems = result.data.bidders.reduce(
+				const { toLegacyBidders } = await import("../schemas/bid-tabulation.js");
+				const legacy = toLegacyBidders(result.data);
+				const lineItems = legacy.reduce(
 					(sum, b) => sum + (b.lineItems?.length ?? 0),
 					0,
 				);

@@ -1,14 +1,12 @@
 /**
  * Validator Agent
  *
- * Cross-checks extracted data for consistency:
- * - unit price × quantity = extended price
- * - line items sum to section/bid totals
- * - bidder ranks are sequential
- * - required fields are present
+ * Cross-checks extracted data for consistency.
+ * Works on legacy flat Bidder[] format.
+ * Reports only — does NOT fix values.
  */
 
-import type { BidTabulation } from "../schemas/bid-tabulation.js";
+import type { Bidder } from "../schemas/bid-tabulation.js";
 
 export interface ValidationResult {
 	valid: boolean;
@@ -23,14 +21,15 @@ export interface ValidationError {
 	actual?: string | number;
 }
 
-export function validateBidTabulation(data: BidTabulation): ValidationResult {
+export function validateBidTabulation(data: {
+	bidders: Bidder[];
+	[key: string]: unknown;
+}): ValidationResult {
 	const errors: ValidationError[] = [];
 	const warnings: string[] = [];
 
-	// Check each bidder's line items
 	for (const bidder of data.bidders) {
 		if (bidder.lineItems && bidder.lineItems.length > 0) {
-			// Check extended = unit × quantity
 			for (const item of bidder.lineItems) {
 				if (
 					item.unitPrice !== undefined &&
@@ -47,7 +46,6 @@ export function validateBidTabulation(data: BidTabulation): ValidationResult {
 				}
 			}
 
-			// Check line items sum to total
 			if (bidder.totalBaseBid !== undefined) {
 				const sum = bidder.lineItems.reduce(
 					(acc, item) => acc + (item.extendedPrice ?? 0),
@@ -63,7 +61,6 @@ export function validateBidTabulation(data: BidTabulation): ValidationResult {
 		}
 	}
 
-	// Check ranks are sequential
 	const ranks = data.bidders.map((b) => b.rank).sort((a, b) => a - b);
 	for (let i = 0; i < ranks.length; i++) {
 		if (ranks[i] !== i + 1) {
@@ -75,9 +72,5 @@ export function validateBidTabulation(data: BidTabulation): ValidationResult {
 		}
 	}
 
-	return {
-		valid: errors.length === 0,
-		errors,
-		warnings,
-	};
+	return { valid: errors.length === 0, errors, warnings };
 }

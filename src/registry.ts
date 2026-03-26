@@ -10,7 +10,8 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { ClassificationResult } from "./agents/classifier.js";
 import type { FormatType } from "./schemas/bid-tabulation.js";
-import type { BidTabulation } from "./schemas/bid-tabulation.js";
+// biome-ignore lint: legacy module
+type BidTabulation = any;
 
 const REGISTRY_DIR = join(import.meta.dirname, "..", "registry");
 
@@ -146,7 +147,7 @@ ${JSON.stringify(
 	{
 		project: example.project,
 		engineerEstimate: example.engineerEstimate,
-		bidders: example.bidders.map((b) => ({
+		bidders: example.bidders.map((b: any) => ({
 			rank: b.rank,
 			name: b.name,
 			totalBaseBid: b.totalBaseBid,

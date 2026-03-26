@@ -44,6 +44,14 @@ ${context.isContinuation ? "\nThis page is a CONTINUATION of a table from the pr
 
 	return `Extract bid tabulation data from this page.
 
+DOMAIN CONTEXT:
+- A bid tabulation records all bids for a construction project
+- Structure: Contract → Bid Group (Base/Supplemental/Alternate) → Section → Items
+- Items may have sub-items (e.g., item 1 with sub-items 1a, 1b, 1c)
+- "LS" = Lump Sum (qty=1, unitPrice=extendedPrice)
+- Quantities are set by the engineer — same for all bidders
+- Each bidder has their own unit price and extended price per item
+
 ${bidderContext}
 
 Respond with ONLY valid JSON:
@@ -51,23 +59,36 @@ Respond with ONLY valid JSON:
   "bidders": ${context.bidderNames.length > 0
 		? `["${context.bidderNames.join('", "')}"]`
 		: '["list of bidder names from column headers"]'},
+  "bidGroupType": "base" or "supplemental" or "alternate",
+  "bidGroupName": "Base Bid" or "Supplemental Bid Prices" or "Alternate 1" etc,
   "sections": [
     {
-      "name": "section name if visible (e.g., Bridge Items, Roadway Items)",
+      "name": "section name if visible (e.g., Bridge Items, Roadway Items, or empty string if none)",
       "items": [
         {
           "itemNo": "1",
           "description": "Item description",
           "unit": "LS",
           "quantity": 1,
+          "subItems": [
+            {
+              "itemNo": "1a",
+              "description": "Sub-item description",
+              "unit": "LS",
+              "quantity": 1,
+              "bids": {"Bidder Name": {"unitPrice": 100, "extendedPrice": 100}}
+            }
+          ],
           "bids": {
             "Bidder Name": {"unitPrice": 100.00, "extendedPrice": 100.00},
             "Other Bidder": {"unitPrice": 120.00, "extendedPrice": 120.00}
           }${context.hasEngineerEstimate ? ',\n          "engineerEstimate": {"unitPrice": 90.00, "extendedPrice": 90.00}' : ""}
         }
-      ]
+      ],
+      "subtotals": {"Bidder Name": 50000, "Other Bidder": 60000}
     }
   ],
+  "totals": {"Bidder Name": 500000, "Other Bidder": 600000},
   "continuedFromPrevious": ${context.isContinuation},
   "continuedOnNext": false
 }
@@ -75,10 +96,13 @@ Respond with ONLY valid JSON:
 Rules:
 - Use the EXACT bidder names provided (or from headers if first page)
 - The "bids" object keys MUST match the bidder names exactly
-- If items have sub-items (a, b, c under item 1), use itemNo like "1a", "1b"
+- If items have sub-items (a, b, c, d, e, f under a parent item), put them in "subItems" array
+- Only include subItems if the document actually shows a breakdown — don't fabricate
 - All monetary values as numbers (no $ signs, no commas)
 - Only set unitPrice if explicitly shown — NEVER back-calculate
-- If a section header is visible, set the section name`;
+- If section headers are visible, use them. If no sections, use a single section with empty name
+- Include subtotals and totals if they appear in the document
+- bidGroupType: "base" for the main bid, "supplemental" for extra items, "alternate" for alternates`;
 }
 
 function buildBidRankingPrompt(): string {

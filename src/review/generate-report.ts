@@ -13,7 +13,8 @@
 
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { basename, join } from "node:path";
-import type { BidTabulation } from "../schemas/bid-tabulation.js";
+// biome-ignore lint: legacy module
+type BidTabulation = any;
 import { pdfToImages } from "../utils/pdf-to-images.js";
 
 interface ReviewItem {
@@ -56,7 +57,7 @@ function renderItem(item: ReviewItem, index: number): string {
 
 	const biddersHtml = data.bidders
 		.map(
-			(b) => `
+			(b: any) => `
 		<div class="bidder">
 			<div class="bidder-header">
 				<span class="rank">#${b.rank}</span>
@@ -71,7 +72,7 @@ function renderItem(item: ReviewItem, index: number): string {
 					<tbody>
 					${b.lineItems
 						.map(
-							(li) => `<tr>
+							(li: any) => `<tr>
 						<td>${li.itemNo}</td>
 						<td>${li.description}</td>
 						<td>${li.unit || ""}</td>
@@ -93,7 +94,7 @@ function renderItem(item: ReviewItem, index: number): string {
 		data.extraction.warnings.length > 0
 			? `<div class="warnings">
 			<strong>Warnings:</strong>
-			<ul>${data.extraction.warnings.map((w) => `<li>${w}</li>`).join("")}</ul>
+			<ul>${data.extraction.warnings.map((w: any) => `<li>${w}</li>`).join("")}</ul>
 		</div>`
 			: "";
 

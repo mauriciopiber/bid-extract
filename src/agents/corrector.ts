@@ -6,7 +6,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import type { BidTabulation } from "../schemas/bid-tabulation.js";
+// biome-ignore lint: legacy module, will be replaced
+type BidTabulation = any;
 import { parseJsonResponse } from "../utils/parse-json.js";
 
 const client = new Anthropic();

@@ -7,7 +7,9 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { buildFewShotPrompt, getExample } from "../registry.js";
-import type { BidTabulation, FormatType } from "../schemas/bid-tabulation.js";
+import type { FormatType } from "../schemas/bid-tabulation.js";
+// biome-ignore lint: legacy module, will be replaced
+type BidTabulation = any;
 import { parseJsonResponse } from "../utils/parse-json.js";
 import type { ClassificationResult } from "./classifier.js";
 

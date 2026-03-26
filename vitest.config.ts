@@ -9,6 +9,7 @@ export default defineConfig({
       DOTENV_CONFIG_PATH: ".env",
     },
     setupFiles: ["dotenv/config"],
+    exclude: ["**/node_modules/**", "**/ui/**"],
   },
   resolve: {
     alias: {

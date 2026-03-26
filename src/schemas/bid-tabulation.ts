@@ -1,113 +1,211 @@
 /**
  * Universal output schema for bid tabulations.
  *
- * Every PDF — regardless of format — gets normalized to this structure.
- * Fields are optional where not all formats provide the data.
+ * Hierarchy: Document → Contract(s) → BidGroup(s) → Section(s) → Item(s) → SubItem(s)
+ * See docs/bid-glossary.md for definitions.
  */
 
+// -- New hierarchical schema --
+
 export interface BidTabulation {
-	/** Source file */
 	sourceFile: string;
-
-	/** Project metadata */
 	project: ProjectInfo;
-
-	/** Engineer's estimate, if present */
-	engineerEstimate?: EstimateInfo;
-
-	/** All bidders and their bids */
-	bidders: Bidder[];
-
-	/** Extraction metadata */
+	contracts: Contract[];
+	bidders: BidderInfo[];
+	engineerEstimate?: { total: number };
 	extraction: ExtractionMeta;
 }
 
 export interface ProjectInfo {
-	/** Project name / title */
 	name: string;
-	/** Project number / ID (e.g., "BRO-R042(31)", "6225050025") */
 	projectId?: string;
-	/** Owner entity (county, city, etc.) */
 	owner?: string;
-	/** Bid opening date */
 	bidDate?: string;
-	/** Project location */
 	location?: string;
-	/** Project description / scope */
 	description?: string;
+	engineer?: string;
 }
 
-export interface EstimateInfo {
-	/** Total engineer's estimate */
-	total: number;
-	/** Line-item breakdown, if available */
-	lineItems?: LineItem[];
-}
-
-export interface Bidder {
-	/** Rank (1 = low bidder / apparent winner) */
-	rank: number;
-	/** Company name */
+export interface Contract {
 	name: string;
-	/** Address */
-	address?: string;
-	/** Phone */
-	phone?: string;
-	/** Total base bid */
-	totalBaseBid?: number;
-	/** Total bid including alternates */
-	totalBid?: number;
-	/** Line-item breakdown */
-	lineItems?: LineItem[];
-	/** Alternate bids */
-	alternates?: AlternateBid[];
+	bidGroups: BidGroup[];
 }
 
-export interface LineItem {
-	/** Item number */
+export interface BidGroup {
+	type: "base" | "supplemental" | "alternate" | "allowance";
+	name: string;
+	sections: Section[];
+	totals?: Record<string, number>;
+}
+
+export interface Section {
+	name: string;
+	items: Item[];
+	subtotals?: Record<string, number>;
+}
+
+export interface Item {
 	itemNo: string | number;
-	/** Description */
 	description: string;
-	/** Section/group as shown in the document (e.g., "Bridge Items", "Roadway Items") */
-	section?: string;
-	/** Unit of measure (LS, EA, SY, LF, CY, TON, etc.) */
 	unit?: string;
-	/** Estimated quantity */
 	quantity?: number;
-	/** Unit price */
+	subItems?: Item[];
+	bids: Record<string, BidValue>;
+	engineerEstimate?: BidValue;
+}
+
+export interface BidValue {
 	unitPrice?: number;
-	/** Extended / total price */
 	extendedPrice?: number;
 }
 
-export interface AlternateBid {
-	/** Alternate name/number */
+export interface BidderInfo {
+	rank: number;
 	name: string;
-	/** Total for this alternate */
-	total?: number;
-	/** Line items within the alternate */
-	lineItems?: LineItem[];
+	address?: string;
+	phone?: string;
+	totalBaseBid?: number;
+	totalBid?: number;
 }
 
 export interface ExtractionMeta {
-	/** Format classification */
 	formatType: FormatType;
-	/** Confidence score 0-1 */
 	confidence: number;
-	/** Number of pages processed */
 	pagesProcessed: number;
-	/** Validation warnings */
 	warnings: string[];
-	/** Processing time in ms */
 	processingTimeMs: number;
 }
 
 export type FormatType =
-	| "simple-table" // Clean table, few bidders, few items
-	| "multi-bidder-matrix" // Wide table with many bidders across columns
-	| "summary-only" // Just bidder names + totals, no line items
-	| "engineering-firm" // Formal engineering template with item codes
-	| "multi-section" // Base bid + alternates sections
-	| "handwritten" // Scanned with handwritten values
-	| "submission-list" // Just supplier names + dates, no prices
+	| "simple-table"
+	| "multi-bidder-matrix"
+	| "summary-only"
+	| "engineering-firm"
+	| "multi-section"
+	| "handwritten"
+	| "submission-list"
 	| "unknown";
+
+// -- Legacy flat types (used by validator, math-resolver) --
+
+export interface LineItem {
+	itemNo: string | number;
+	description: string;
+	section?: string;
+	unit?: string;
+	quantity?: number;
+	unitPrice?: number;
+	extendedPrice?: number;
+}
+
+export interface Bidder {
+	rank: number;
+	name: string;
+	address?: string;
+	phone?: string;
+	totalBaseBid?: number;
+	totalBid?: number;
+	lineItems?: LineItem[];
+	alternates?: AlternateBid[];
+}
+
+export interface AlternateBid {
+	name: string;
+	total?: number;
+	lineItems?: LineItem[];
+}
+
+export interface EstimateInfo {
+	total: number;
+	lineItems?: LineItem[];
+}
+
+/** Flatten hierarchical BidTabulation → legacy Bidder[] for validator */
+export function toLegacyBidders(tab: BidTabulation): Bidder[] {
+	const bidderMap = new Map<string, Bidder>();
+	for (const b of tab.bidders) {
+		bidderMap.set(b.name, { ...b, lineItems: [] });
+	}
+	for (const contract of tab.contracts) {
+		for (const group of contract.bidGroups) {
+			for (const section of group.sections) {
+				flattenItems(section.items, section.name, bidderMap);
+			}
+		}
+	}
+	return Array.from(bidderMap.values());
+}
+
+/** Flatten hierarchical items → legacy engineer estimate */
+export function toLegacyEstimate(
+	tab: BidTabulation,
+): EstimateInfo | undefined {
+	const items: LineItem[] = [];
+	for (const contract of tab.contracts) {
+		for (const group of contract.bidGroups) {
+			for (const section of group.sections) {
+				collectEngEstimate(section.items, section.name, items);
+			}
+		}
+	}
+	if (items.length === 0 && !tab.engineerEstimate) return undefined;
+	return {
+		total:
+			tab.engineerEstimate?.total ??
+			items.reduce((s, i) => s + (i.extendedPrice ?? 0), 0),
+		lineItems: items.length > 0 ? items : undefined,
+	};
+}
+
+function flattenItems(
+	items: Item[],
+	sectionName: string,
+	bidderMap: Map<string, Bidder>,
+) {
+	for (const item of items) {
+		for (const [name, bid] of Object.entries(item.bids)) {
+			if (!bidderMap.has(name)) {
+				bidderMap.set(name, {
+					rank: bidderMap.size + 1,
+					name,
+					lineItems: [],
+				});
+			}
+			bidderMap.get(name)!.lineItems!.push({
+				itemNo: item.itemNo,
+				description: item.description,
+				section: sectionName,
+				unit: item.unit,
+				quantity: item.quantity,
+				unitPrice: bid.unitPrice,
+				extendedPrice: bid.extendedPrice,
+			});
+		}
+		if (item.subItems) {
+			flattenItems(item.subItems, sectionName, bidderMap);
+		}
+	}
+}
+
+function collectEngEstimate(
+	items: Item[],
+	sectionName: string,
+	out: LineItem[],
+) {
+	for (const item of items) {
+		if (item.engineerEstimate?.extendedPrice != null) {
+			out.push({
+				itemNo: item.itemNo,
+				description: item.description,
+				section: sectionName,
+				unit: item.unit,
+				quantity: item.quantity,
+				unitPrice: item.engineerEstimate.unitPrice,
+				extendedPrice: item.engineerEstimate.extendedPrice,
+			});
+		}
+		if (item.subItems) {
+			collectEngEstimate(item.subItems, sectionName, out);
+		}
+	}
+}
