@@ -66,12 +66,12 @@ function BidRankingPage({ data }: { data: Record<string, unknown> }) {
           {project.projectId && <p className="text-xs text-muted-foreground font-mono">{project.projectId}</p>}
         </div>
       )}
-      <Table className="table-fixed">
+      <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[70px]">Rank</TableHead>
+            <TableHead>Rank</TableHead>
             <TableHead>Bidder</TableHead>
-            <TableHead className="w-[150px] text-right">Total Bid</TableHead>
+            <TableHead className="text-right">Total Bid</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -110,16 +110,16 @@ function BidTabulationPage({ data }: { data: Record<string, unknown> }) {
           {section.name && (
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">{section.name}</h3>
           )}
-          <Table className="table-fixed">
+          <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead className="w-[40%]">Description</TableHead>
-                <TableHead className="w-[50px]">Unit</TableHead>
-                <TableHead className="w-[60px] text-right">Qty</TableHead>
-                <TableHead className="w-[100px] text-right">Eng Est</TableHead>
+                <TableHead className="whitespace-nowrap">#</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="whitespace-nowrap">Unit</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Qty</TableHead>
+                <TableHead className="text-right whitespace-nowrap">Eng Est</TableHead>
                 {bidderNames.map((n) => (
-                  <TableHead key={n} className="w-[120px] text-right">{n.length > 15 ? n.slice(0, 15) + "…" : n}</TableHead>
+                  <TableHead key={n} className="text-right whitespace-nowrap">{n}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
