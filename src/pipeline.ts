@@ -358,6 +358,20 @@ function mergePageResults(
 		});
 	}
 
+	// Compute engineer estimate total from per-item data
+	let computedEngTotal = 0;
+	for (const contract of contracts) {
+		for (const group of contract.bidGroups) {
+			for (const section of group.sections) {
+				for (const item of section.items) {
+					if (item.engineerEstimate?.extendedPrice) {
+						computedEngTotal += item.engineerEstimate.extendedPrice;
+					}
+				}
+			}
+		}
+	}
+
 	const bidders = Array.from(bidderMap.values()).sort(
 		(a, b) => a.rank - b.rank,
 	);
@@ -369,7 +383,11 @@ function mergePageResults(
 			: { name: sourceFile.replace(".pdf", "") },
 		contracts,
 		bidders,
-		engineerEstimate: engTotal ? { total: engTotal } : undefined,
+		engineerEstimate: engTotal
+			? { total: engTotal }
+			: computedEngTotal > 0
+				? { total: Math.round(computedEngTotal * 100) / 100 }
+				: undefined,
 		extraction: {
 			formatType: "unknown",
 			confidence: 0,

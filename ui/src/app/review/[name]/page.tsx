@@ -167,32 +167,32 @@ function BidTabulationView({ data }: { data: Record<string, unknown> }) {
                 <th className="px-2 py-1">Description</th>
                 <th className="px-2 py-1">Unit</th>
                 <th className="px-2 py-1 text-right">Qty</th>
+                <th className="px-2 py-1 text-right">Eng. Est.</th>
                 <th className="px-2 py-1 text-right">Bids</th>
               </tr>
             </thead>
             <tbody>
               {(section.items ?? []).map((item, ii) => {
-                const bids = (item.bids as { bidder: string; unitPrice?: number; extendedPrice?: number }[]) ?? [];
+                const bids = item.bids as Record<string, { unitPrice?: number; extendedPrice?: number }> | undefined;
+                const engEst = item.engineerEstimate as { unitPrice?: number; extendedPrice?: number } | undefined;
                 return (
                   <tr key={ii} className="border-t border-gray-100">
                     <td className="px-2 py-1">{String(item.itemNo ?? "")}</td>
                     <td className="px-2 py-1">{String(item.description ?? "")}</td>
                     <td className="px-2 py-1">{String(item.unit ?? "")}</td>
                     <td className="px-2 py-1 text-right">{item.quantity != null ? String(item.quantity) : ""}</td>
+                    <td className="px-2 py-1 text-right text-gray-500">
+                      {engEst ? formatMoney(engEst.extendedPrice) : ""}
+                    </td>
                     <td className="px-2 py-1 text-right">
                       {bids && typeof bids === "object" && !Array.isArray(bids)
-                        ? Object.entries(bids as Record<string, { unitPrice?: number; extendedPrice?: number }>).map(([name, bid]) => (
+                        ? Object.entries(bids).map(([name, bid]) => (
                           <div key={name} className="text-xs">
                             <span className="text-gray-400">{name}: </span>
                             {formatMoney(bid.extendedPrice)}
                           </div>
                         ))
-                        : Array.isArray(bids) && bids.map((bid: { bidder?: string; extendedPrice?: number }, bi: number) => (
-                          <div key={bi} className="text-xs">
-                            <span className="text-gray-400">{bid.bidder}: </span>
-                            {formatMoney(bid.extendedPrice)}
-                          </div>
-                        ))}
+                        : null}
                     </td>
                   </tr>
                 );
