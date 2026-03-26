@@ -1,16 +1,19 @@
 /**
- * Extraction pipeline — page by page.
+ * Extraction pipeline — page by page with context passing.
  *
- * For each page:
- *   render → classify → extract (based on page type) → store
- *
- * Then merge page results into document-level result.
+ * Page 1 establishes bidder names. Pages 2+ receive those names as context
+ * so they map data to the SAME bidders. Merge is trivial — same name = same bidder.
  */
 
 import { basename } from "node:path";
 import { classifyPage } from "./agents/classifier.js";
-import type { PageClassification, DocumentClassification } from "./agents/classifier.js";
-import { extractPage } from "./agents/page-extractor.js";
+import type { PageClassification } from "./agents/classifier.js";
+import {
+	extractPage,
+	extractBidderNames,
+	type PageContext,
+	type PageExtractionResult,
+} from "./agents/page-extractor.js";
 import { resolveMath } from "./agents/math-resolver.js";
 import { validateBidTabulation } from "./agents/validator.js";
 import {
@@ -21,7 +24,7 @@ import {
 } from "./db/operations.js";
 import { db, schema } from "./db/index.js";
 import { PipelineLogger } from "./db/logger.js";
-import type { BidTabulation } from "./schemas/bid-tabulation.js";
+import type { BidTabulation, Bidder, LineItem } from "./schemas/bid-tabulation.js";
 import { pdfToImages } from "./utils/pdf-to-images.js";
 
 export interface PipelineResult {
@@ -34,7 +37,7 @@ export interface PipelineResult {
 
 export async function runPipeline(
 	pdfPath: string,
-	maxCorrections = 2,
+	_maxCorrections = 2,
 ): Promise<PipelineResult> {
 	const startTime = Date.now();
 	const logger = new PipelineLogger();
@@ -45,34 +48,58 @@ export async function runPipeline(
 
 	// Step 1: Render pages
 	const pages = await pdfToImages(pdfPath);
-	await logger.log("render", `${pages.length} page(s)`, {
-		pageCount: pages.length,
-	});
+	await logger.log("render", `${pages.length} page(s)`);
 
-	// Step 2: Classify + extract each page
-	const pageClassifications: PageClassification[] = [];
-	const pageResults: { pageNumber: number; pageType: string; data: Record<string, unknown> }[] = [];
-
+	// Step 2: Classify all pages first
+	const classifications: PageClassification[] = [];
 	for (const page of pages) {
-		// Classify
-		const classification = await classifyPage(page.image, page.pageNumber);
-		pageClassifications.push(classification);
-
+		const c = await classifyPage(page.image, page.pageNumber);
+		classifications.push(c);
 		await logger.log(
 			"classify",
-			`p${page.pageNumber}: ${classification.pageType} (${Math.round(classification.confidence * 100)}%)`,
-			classification,
+			`p${page.pageNumber}: ${c.pageType} (${Math.round(c.confidence * 100)}%)`,
+			c,
 		);
+	}
 
-		// Extract (skip "other" pages)
+	// Step 3: Extract page by page WITH context
+	const context: PageContext = {
+		bidderNames: [],
+		hasEngineerEstimate: classifications.some((c) => c.hasEngineerEstimate),
+		sections: [],
+		isContinuation: false,
+	};
+
+	const pageResults: PageExtractionResult[] = [];
+
+	for (let i = 0; i < pages.length; i++) {
+		const page = pages[i];
+		const classification = classifications[i];
+
 		if (classification.pageType === "other") {
 			await logger.log("extract", `p${page.pageNumber}: skipped (other)`);
 			continue;
 		}
 
+		// Is this a continuation of a table from a previous page?
+		if (i > 0 && classification.pageType === "bid_tabulation") {
+			const prevType = classifications[i - 1]?.pageType;
+			context.isContinuation = prevType === "bid_tabulation";
+		}
+
 		try {
-			const result = await extractPage(page.image, classification);
+			const result = await extractPage(page.image, classification, context);
 			pageResults.push(result);
+
+			// Update context with what this page found
+			const newBidders = extractBidderNames(result);
+			if (newBidders.length > 0 && context.bidderNames.length === 0) {
+				context.bidderNames = newBidders;
+				await logger.log(
+					"context",
+					`p${page.pageNumber}: established ${newBidders.length} bidders: ${newBidders.join(", ")}`,
+				);
+			}
 
 			// Store per-page result
 			await db.insert(schema.pageExtractions).values({
@@ -87,7 +114,6 @@ export async function runPipeline(
 			await logger.log(
 				"extract",
 				`p${page.pageNumber}: ${classification.pageType} extracted`,
-				{ keys: Object.keys(result.data) },
 			);
 		} catch (err) {
 			await logger.error(
@@ -97,55 +123,44 @@ export async function runPipeline(
 		}
 	}
 
-	// Step 3: Merge page results into document-level BidTabulation
+	// Step 4: Merge page results
 	const data = mergePageResults(pageResults, pdfFile);
 
-	// Step 4: Math resolver
+	// Step 5: Math resolver
 	const mathResult = resolveMath(data);
 	if (mathResult.corrected > 0) {
-		await logger.log("math-resolve", `fixed ${mathResult.corrected} values`, {
-			corrections: mathResult.corrections,
-		});
+		await logger.log("math-resolve", `fixed ${mathResult.corrected} values`);
 	}
 
-	// Step 5: Validate
+	// Step 6: Validate
 	const validation = validateBidTabulation(data);
 	if (validation.errors.length > 0 || validation.warnings.length > 0) {
 		await logger.log(
 			"validate",
 			`${validation.errors.length} errors, ${validation.warnings.length} warnings`,
-			{ errors: validation.errors, warnings: validation.warnings },
 		);
 	}
 
 	data.extraction.warnings = validation.warnings;
 	data.extraction.processingTimeMs = Date.now() - startTime;
 
-	// Step 6: Build document classification from pages
-	const docClassification = buildDocClassification(pageClassifications);
-
-	// Step 7: Find/create layout
-	const fingerprint = `${docClassification.formatType}:${docClassification.bidderCount}b:${docClassification.hasLineItems ? "li" : "no-li"}:${pages.length}p`;
+	// Step 7: Layout + scoring
+	const docClass = buildDocClassification(classifications);
+	const fingerprint = `${docClass.formatType}:${docClass.bidderCount}b:${docClass.hasLineItems ? "li" : "no-li"}:${pages.length}p`;
 	const layout = await findOrCreateLayout(
 		fingerprint,
-		`${docClassification.formatType} (${docClassification.bidderCount} bidders, ${pages.length}p)`,
-		docClassification.formatType,
-		{
-			pageTypes: pageClassifications.map((p) => p.pageType),
-			bidderCount: docClassification.bidderCount,
-			hasLineItems: docClassification.hasLineItems,
-			pageCount: pages.length,
-		},
+		`${docClass.formatType} (${docClass.bidderCount} bidders, ${pages.length}p)`,
+		docClass.formatType,
+		{ pageTypes: classifications.map((c) => c.pageType), ...docClass },
 	);
 
-	// Step 8: Score
 	const totalLineItems = data.bidders.reduce(
 		(sum, b) => sum + (b.lineItems?.length ?? 0),
 		0,
 	);
 
 	const mathScore = computeMathScore(data);
-	const completenessScore = computeCompletenessScore(data, docClassification);
+	const completenessScore = computeCompletenessScore(data, docClass);
 	const overall = Math.round((mathScore + completenessScore) / 2);
 
 	await updateExtraction(extraction.id, {
@@ -178,65 +193,66 @@ export async function runPipeline(
 	};
 }
 
-/** Merge per-page extraction results into a single BidTabulation */
+/** Merge per-page results into BidTabulation using bidder name as identity key */
 function mergePageResults(
-	pageResults: { pageNumber: number; pageType: string; data: Record<string, unknown> }[],
+	pageResults: PageExtractionResult[],
 	sourceFile: string,
 ): BidTabulation {
-	// biome-ignore lint: dynamic page data
-	const project: any = {};
-	// biome-ignore lint: dynamic page data
-	const bidders: any[] = [];
-	// biome-ignore lint: dynamic page data
-	let engineerEstimate: any = undefined;
+	const projectInfo: Record<string, string> = {};
+	const bidderMap = new Map<string, Bidder>();
+	let engineerEstimate: { total: number; lineItems: LineItem[] } | undefined;
 
 	for (const page of pageResults) {
 		const d = page.data;
 
-		// Merge project info from any page that has it
-		if (d.project) {
-			Object.assign(project, d.project);
+		// Project info from any page
+		if (d.project && typeof d.project === "object") {
+			Object.assign(projectInfo, d.project);
 		}
 
-		// Merge bidders from ranking pages
+		// Bid ranking pages → bidder totals
 		if (page.pageType === "bid_ranking" && Array.isArray(d.bidders)) {
-			for (const b of d.bidders) {
-				const existing = bidders.find(
-					// biome-ignore lint: dynamic
-					(eb: any) => eb.name === b.name,
-				);
+			for (const b of d.bidders as { rank?: number; name: string; totalBaseBid?: number; address?: string }[]) {
+				const existing = bidderMap.get(b.name);
 				if (existing) {
-					Object.assign(existing, b);
+					if (b.totalBaseBid) existing.totalBaseBid = b.totalBaseBid;
+					if (b.address) existing.address = b.address;
 				} else {
-					bidders.push({ ...b });
+					bidderMap.set(b.name, {
+						rank: b.rank ?? bidderMap.size + 1,
+						name: b.name,
+						totalBaseBid: b.totalBaseBid,
+						address: b.address,
+						lineItems: [],
+					});
 				}
 			}
 		}
 
-		// Merge line items from tabulation pages
+		// Bid tabulation pages → line items per bidder
 		if (page.pageType === "bid_tabulation" && Array.isArray(d.sections)) {
-			for (const section of d.sections as { name?: string; items?: unknown[] }[]) {
-				if (!Array.isArray(section.items)) continue;
-				for (const item of section.items as Record<string, unknown>[]) {
-					const bids = item.bids as { bidder: string; unitPrice?: number; extendedPrice?: number }[] | undefined;
+			for (const section of d.sections as { name?: string; items?: Record<string, unknown>[] }[]) {
+				for (const item of section.items ?? []) {
+					const bids = item.bids as Record<string, { unitPrice?: number; extendedPrice?: number }> | undefined;
 					if (!bids) continue;
 
-					for (const bid of bids) {
-						let bidder = bidders.find(
-							// biome-ignore lint: dynamic
-							(b: any) => b.name === bid.bidder,
-						);
-						if (!bidder) {
-							bidder = { rank: bidders.length + 1, name: bid.bidder, lineItems: [] };
-							bidders.push(bidder);
+					for (const [bidderName, bid] of Object.entries(bids)) {
+						if (!bidderMap.has(bidderName)) {
+							bidderMap.set(bidderName, {
+								rank: bidderMap.size + 1,
+								name: bidderName,
+								lineItems: [],
+							});
 						}
+						const bidder = bidderMap.get(bidderName)!;
 						if (!bidder.lineItems) bidder.lineItems = [];
+
 						bidder.lineItems.push({
-							itemNo: item.itemNo,
-							description: item.description,
-							section: section.name || item.section,
-							unit: item.unit,
-							quantity: item.quantity,
+							itemNo: item.itemNo as string | number,
+							description: item.description as string,
+							section: section.name,
+							unit: item.unit as string | undefined,
+							quantity: item.quantity as number | undefined,
 							unitPrice: bid.unitPrice,
 							extendedPrice: bid.extendedPrice,
 						});
@@ -247,41 +263,39 @@ function mergePageResults(
 					if (engEst) {
 						if (!engineerEstimate) engineerEstimate = { total: 0, lineItems: [] };
 						engineerEstimate.lineItems.push({
-							itemNo: item.itemNo,
-							description: item.description,
-							section: section.name || item.section,
-							unit: item.unit,
-							quantity: item.quantity,
+							itemNo: item.itemNo as string | number,
+							description: item.description as string,
+							section: section.name,
+							unit: item.unit as string | undefined,
+							quantity: item.quantity as number | undefined,
 							unitPrice: engEst.unitPrice,
 							extendedPrice: engEst.extendedPrice,
 						});
-						if (engEst.extendedPrice) {
-							engineerEstimate.total += engEst.extendedPrice;
-						}
+						if (engEst.extendedPrice) engineerEstimate.total += engEst.extendedPrice;
 					}
 				}
-			}
-		}
-
-		// Cover page
-		if (page.pageType === "cover" && d.project) {
-			Object.assign(project, d.project);
-		}
-
-		// Summary page
-		if (page.pageType === "summary") {
-			if (d.engineerEstimate && !engineerEstimate) {
-				engineerEstimate = { total: d.engineerEstimate };
 			}
 		}
 	}
 
 	// Sort bidders by rank
-	bidders.sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
+	const bidders = Array.from(bidderMap.values()).sort(
+		(a, b) => a.rank - b.rank,
+	);
+
+	// Compute totals from line items if not set from ranking
+	for (const bidder of bidders) {
+		if (!bidder.totalBaseBid && bidder.lineItems && bidder.lineItems.length > 0) {
+			bidder.totalBaseBid = bidder.lineItems.reduce(
+				(sum, li) => sum + (li.extendedPrice ?? 0),
+				0,
+			);
+		}
+	}
 
 	return {
 		sourceFile,
-		project: project.name ? project : { name: sourceFile.replace(".pdf", "") },
+		project: projectInfo.name ? projectInfo as unknown as BidTabulation["project"] : { name: sourceFile.replace(".pdf", "") },
 		bidders,
 		engineerEstimate,
 		extraction: {
@@ -294,13 +308,10 @@ function mergePageResults(
 	};
 }
 
-function buildDocClassification(
-	pages: PageClassification[],
-): { formatType: string; bidderCount: number; hasLineItems: boolean } {
+function buildDocClassification(pages: PageClassification[]) {
 	const tabPages = pages.filter((p) => p.pageType === "bid_tabulation");
 	const rankPages = pages.filter((p) => p.pageType === "bid_ranking");
 	const hasLineItems = tabPages.length > 0;
-
 	let formatType = "unknown";
 	if (tabPages.length > 0) {
 		const maxBidders = Math.max(...tabPages.map((p) => p.bidderCount));
@@ -311,7 +322,6 @@ function buildDocClassification(
 	} else if (rankPages.length > 0) {
 		formatType = "summary-only";
 	}
-
 	const allBidders = pages.map((p) => p.bidderCount).filter((c) => c > 0);
 	return {
 		formatType,
