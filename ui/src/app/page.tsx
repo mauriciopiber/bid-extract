@@ -3,114 +3,118 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface ExtractionSummary {
+interface Layout {
+  id: number;
+  fingerprint: string;
   name: string;
-  sourceFile: string;
-  project: { name: string; owner?: string; bidDate?: string };
-  bidderCount: number;
   formatType: string;
-  confidence: number;
-  warnings: number;
-  processingTimeMs: number;
+  status: string;
+  sampleCount: number;
+  avgScore: number | null;
+  extractionCount: number;
+  cleanCount: number;
 }
 
+const STATUS_COLORS: Record<string, string> = {
+  discovered: "bg-gray-100 text-gray-700",
+  extracting: "bg-blue-100 text-blue-700",
+  validating: "bg-yellow-100 text-yellow-700",
+  contesting: "bg-red-100 text-red-700",
+  evolving: "bg-purple-100 text-purple-700",
+  stable: "bg-green-100 text-green-700",
+};
+
 export default function Home() {
-  const [extractions, setExtractions] = useState<ExtractionSummary[]>([]);
-  const [filter, setFilter] = useState("");
+  const [layouts, setLayouts] = useState<Layout[]>([]);
 
   useEffect(() => {
-    fetch("/api/extractions")
+    fetch("/api/layouts")
       .then((r) => r.json())
-      .then(setExtractions);
+      .then(setLayouts);
   }, []);
 
-  const filtered = extractions.filter(
-    (e) =>
-      e.name.toLowerCase().includes(filter.toLowerCase()) ||
-      e.project.name.toLowerCase().includes(filter.toLowerCase()) ||
-      e.formatType.includes(filter.toLowerCase())
+  const totalExtractions = layouts.reduce(
+    (s, l) => s + l.extractionCount,
+    0,
   );
-
-  const clean = filtered.filter((e) => e.warnings === 0).length;
-  const withWarnings = filtered.length - clean;
+  const totalClean = layouts.reduce((s, l) => s + l.cleanCount, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-900 text-white px-8 py-5">
-        <h1 className="text-xl font-bold">Bid Extract Review</h1>
+        <h1 className="text-xl font-bold">Bid Extract</h1>
         <p className="text-gray-400 text-sm mt-1">
-          {extractions.length} extractions — {clean} clean, {withWarnings} with
-          warnings
+          {layouts.length} layouts — {totalExtractions} extractions —{" "}
+          {totalClean} clean
         </p>
       </header>
 
-      <div className="px-8 py-4">
-        <input
-          type="text"
-          placeholder="Filter by name, project, or format..."
-          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg text-sm"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-      </div>
-
-      <div className="px-8 pb-8">
-        <table className="w-full bg-white rounded-lg shadow-sm overflow-hidden">
-          <thead>
-            <tr className="bg-gray-100 text-left text-sm text-gray-600">
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Project</th>
-              <th className="px-4 py-3">Format</th>
-              <th className="px-4 py-3">Bidders</th>
-              <th className="px-4 py-3">Confidence</th>
-              <th className="px-4 py-3">Warnings</th>
-              <th className="px-4 py-3">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((e) => (
-              <tr
-                key={e.name}
-                className="border-t border-gray-100 hover:bg-blue-50 transition-colors"
-              >
-                <td className="px-4 py-3">
-                  {e.warnings === 0 ? "✅" : "⚠️"}
-                </td>
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/review/${e.name}`}
-                    className="text-blue-600 hover:underline font-medium"
-                  >
-                    {e.project.name}
-                  </Link>
-                  <div className="text-xs text-gray-400">
-                    {e.project.owner}
-                    {e.project.bidDate ? ` — ${e.project.bidDate}` : ""}
+      <div className="px-8 py-6">
+        <div className="grid gap-4">
+          {layouts.map((l) => (
+            <Link
+              key={l.id}
+              href={`/layout-view/${l.id}`}
+              className="block bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow border-l-4"
+              style={{
+                borderLeftColor:
+                  l.status === "stable"
+                    ? "#22c55e"
+                    : l.status === "contesting"
+                      ? "#ef4444"
+                      : "#6b7280",
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900">{l.name}</div>
+                  <div className="text-xs text-gray-400 mt-1 font-mono">
+                    {l.fingerprint}
                   </div>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">
-                    {e.formatType}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center">{e.bidderCount}</td>
-                <td className="px-4 py-3">
-                  {Math.round(e.confidence * 100)}%
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {e.warnings > 0 && (
-                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
-                      {e.warnings}
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-500">
-                  {(e.processingTimeMs / 1000).toFixed(1)}s
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[l.status] ?? "bg-gray-100"}`}
+                >
+                  {l.status}
+                </span>
+
+                <div className="text-right text-sm">
+                  <div className="text-gray-600">
+                    {l.extractionCount} extractions
+                  </div>
+                  <div className="text-gray-400">
+                    {l.cleanCount}/{l.extractionCount} clean
+                  </div>
+                </div>
+
+                {l.avgScore != null && (
+                  <div
+                    className={`text-2xl font-bold ${
+                      l.avgScore >= 90
+                        ? "text-green-600"
+                        : l.avgScore >= 70
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                    }`}
+                  >
+                    {l.avgScore}
+                  </div>
+                )}
+              </div>
+            </Link>
+          ))}
+
+          {layouts.length === 0 && (
+            <div className="text-center text-gray-400 py-12">
+              No layouts yet. Run{" "}
+              <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                pnpm cli extract &lt;pdf&gt;
+              </code>{" "}
+              to start.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

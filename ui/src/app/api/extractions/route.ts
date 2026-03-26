@@ -1,34 +1,24 @@
-import { readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { NextResponse } from "next/server";
-
-const OUTPUT_DIR = join(process.cwd(), "..", "output");
+import { desc } from "drizzle-orm";
+import { db, schema } from "../../../lib/db";
 
 export async function GET() {
-  try {
-    const files = await readdir(OUTPUT_DIR);
-    const jsonFiles = files.filter((f) => f.endsWith(".json")).sort();
+  const extractions = await db
+    .select()
+    .from(schema.extractions)
+    .orderBy(desc(schema.extractions.createdAt))
+    .limit(50);
 
-    const extractions = await Promise.all(
-      jsonFiles.map(async (file) => {
-        const content = await readFile(join(OUTPUT_DIR, file), "utf-8");
-        const data = JSON.parse(content);
-        return {
-          name: file.replace(".json", ""),
-          file,
-          sourceFile: data.sourceFile,
-          project: data.project,
-          bidderCount: data.bidders?.length ?? 0,
-          formatType: data.extraction?.formatType,
-          confidence: data.extraction?.confidence,
-          warnings: data.extraction?.warnings?.length ?? 0,
-          processingTimeMs: data.extraction?.processingTimeMs,
-        };
-      })
-    );
-
-    return NextResponse.json(extractions);
-  } catch {
-    return NextResponse.json([]);
-  }
+  return NextResponse.json(
+    extractions.map((e) => ({
+      id: e.id,
+      name: e.pdfFile.replace(".pdf", ""),
+      file: e.pdfFile,
+      layoutId: e.layoutId,
+      bidderCount: e.bidderCount ?? 0,
+      lineItemCount: e.lineItemCount ?? 0,
+      warningCount: e.warningCount ?? 0,
+      processingTimeMs: e.processingTimeMs ?? 0,
+    })),
+  );
 }
