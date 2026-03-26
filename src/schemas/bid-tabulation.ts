@@ -68,6 +68,8 @@ export interface LineItem {
 	itemNo: string | number;
 	/** Description */
 	description: string;
+	/** Section/group as shown in the document (e.g., "Bridge Items", "Roadway Items") */
+	section?: string;
 	/** Unit of measure (LS, EA, SY, LF, CY, TON, etc.) */
 	unit?: string;
 	/** Estimated quantity */
