@@ -73,7 +73,12 @@ test("extraction detail shows bidder totals and engineer estimate", async ({ pag
 	}
 
 	await page.goto(`/review/${extractions[0].id}`);
-	await page.waitForTimeout(1000);
+	// Click aggregate tab to see totals
+	const aggTab = page.getByRole("tab", { name: /aggregate/i });
+	if (await aggTab.isVisible()) {
+		await aggTab.click();
+	}
+	await page.waitForTimeout(500);
 
 	const body = await page.locator("body").textContent();
 

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Layout {
   id: number;
@@ -15,107 +17,60 @@ interface Layout {
   cleanCount: number;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  discovered: "bg-gray-100 text-gray-700",
-  extracting: "bg-blue-100 text-blue-700",
-  validating: "bg-yellow-100 text-yellow-700",
-  contesting: "bg-red-100 text-red-700",
-  evolving: "bg-purple-100 text-purple-700",
-  stable: "bg-green-100 text-green-700",
-};
-
 export default function Home() {
   const [layouts, setLayouts] = useState<Layout[]>([]);
 
   useEffect(() => {
-    fetch("/api/layouts")
-      .then((r) => r.json())
-      .then(setLayouts);
+    fetch("/api/layouts").then((r) => r.json()).then(setLayouts);
   }, []);
 
-  const totalExtractions = layouts.reduce(
-    (s, l) => s + l.extractionCount,
-    0,
-  );
-  const totalClean = layouts.reduce((s, l) => s + l.cleanCount, 0);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-gray-900 text-white px-8 py-5">
-        <h1 className="text-xl font-bold">Bid Extract</h1>
-        <p className="text-gray-400 text-sm mt-1">
-          {layouts.length} layouts — {totalExtractions} extractions —{" "}
-          {totalClean} clean
+    <div className="min-h-screen bg-background">
+      <header className="border-b px-6 py-4">
+        <h1 className="text-2xl font-bold">Bid Extract</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {layouts.length} layouts
         </p>
       </header>
 
-      <div className="px-8 py-6">
-        <div className="grid gap-4">
-          {layouts.map((l) => (
-            <Link
-              key={l.id}
-              href={`/layout-view/${l.id}`}
-              className="block bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow border-l-4"
-              style={{
-                borderLeftColor:
-                  l.status === "stable"
-                    ? "#22c55e"
-                    : l.status === "contesting"
-                      ? "#ef4444"
-                      : "#6b7280",
-              }}
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <div className="font-bold text-gray-900">{l.name}</div>
-                  <div className="text-xs text-gray-400 mt-1 font-mono">
-                    {l.fingerprint}
-                  </div>
+      <main className="p-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {layouts.map((l) => (
+          <Link key={l.id} href={`/layout-view/${l.id}`}>
+            <Card className="hover:border-primary transition-colors cursor-pointer">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm">{l.name}</CardTitle>
+                  <Badge variant={l.status === "stable" ? "default" : "secondary"}>
+                    {l.status}
+                  </Badge>
                 </div>
-
-                <span
-                  className={`px-2 py-1 rounded text-xs font-medium ${STATUS_COLORS[l.status] ?? "bg-gray-100"}`}
-                >
-                  {l.status}
-                </span>
-
-                <div className="text-right text-sm">
-                  <div className="text-gray-600">
-                    {l.extractionCount} extractions
-                  </div>
-                  <div className="text-gray-400">
+                <p className="text-xs text-muted-foreground font-mono">{l.fingerprint}</p>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4 text-sm">
+                  <span>{l.extractionCount} docs</span>
+                  <span className="text-muted-foreground">
                     {l.cleanCount}/{l.extractionCount} clean
-                  </div>
+                  </span>
+                  {l.avgScore != null && (
+                    <span className={`ml-auto font-bold text-lg ${
+                      l.avgScore >= 90 ? "text-green-600" : l.avgScore >= 70 ? "text-yellow-600" : "text-red-600"
+                    }`}>
+                      {l.avgScore}
+                    </span>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
 
-                {l.avgScore != null && (
-                  <div
-                    className={`text-2xl font-bold ${
-                      l.avgScore >= 90
-                        ? "text-green-600"
-                        : l.avgScore >= 70
-                          ? "text-yellow-600"
-                          : "text-red-600"
-                    }`}
-                  >
-                    {l.avgScore}
-                  </div>
-                )}
-              </div>
-            </Link>
-          ))}
-
-          {layouts.length === 0 && (
-            <div className="text-center text-gray-400 py-12">
-              No layouts yet. Run{" "}
-              <code className="bg-gray-100 px-2 py-1 rounded text-sm">
-                pnpm cli extract &lt;pdf&gt;
-              </code>{" "}
-              to start.
-            </div>
-          )}
-        </div>
-      </div>
+        {layouts.length === 0 && (
+          <p className="text-muted-foreground col-span-full text-center py-12">
+            No layouts yet. Run <code className="bg-muted px-1 rounded">npx tsx src/db/seed-fixtures.ts</code>
+          </p>
+        )}
+      </main>
     </div>
   );
 }
