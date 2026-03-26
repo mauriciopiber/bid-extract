@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -7,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 // -- Types --
 
@@ -110,16 +113,20 @@ function BidTabulationPage({ data }: { data: Record<string, unknown> }) {
           {section.name && (
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">{section.name}</h3>
           )}
-          <Table>
+          <div className="overflow-x-auto">
+          <Table className="table-fixed min-w-[800px]" style={{ width: `${800 + bidderNames.length * 200}px` }}>
             <TableHeader>
               <TableRow>
-                <TableHead className="whitespace-nowrap">#</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="whitespace-nowrap">Unit</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Qty</TableHead>
-                <TableHead className="text-right whitespace-nowrap">Eng Est</TableHead>
+                <TableHead className="w-[40px]">#</TableHead>
+                <TableHead className="w-[200px]">Description</TableHead>
+                <TableHead className="w-[40px]">Unit</TableHead>
+                <TableHead className="w-[50px] text-right">Qty</TableHead>
+                <TableHead className="w-[90px] text-right">Eng Est</TableHead>
                 {bidderNames.map((n) => (
-                  <TableHead key={n} className="text-right whitespace-nowrap">{n}</TableHead>
+                  <React.Fragment key={n}>
+                    <TableHead className="w-[90px] text-right text-xs">{n.length > 12 ? n.slice(0, 12) + "…" : n} (unit)</TableHead>
+                    <TableHead className="w-[90px] text-right text-xs">{n.length > 12 ? n.slice(0, 12) + "…" : n} (ext)</TableHead>
+                  </React.Fragment>
                 ))}
               </TableRow>
             </TableHeader>
@@ -129,6 +136,7 @@ function BidTabulationPage({ data }: { data: Record<string, unknown> }) {
               ))}
             </TableBody>
           </Table>
+          </div>
           {section.subtotals && (
             <div className="flex gap-4 text-xs text-muted-foreground border-t pt-1 mt-1">
               <span className="font-bold">Subtotal:</span>
@@ -159,17 +167,34 @@ function ItemRows({ item, bidderNames, depth = 0 }: { item: Item; bidderNames: s
     <>
       <TableRow className={depth > 0 ? "text-muted-foreground text-xs" : ""}>
         <TableCell className="font-mono text-xs">{item.itemNo}</TableCell>
-        <TableCell style={{ paddingLeft: depth * 20 + 8 }}>{item.description}</TableCell>
+        <TableCell className="overflow-hidden" style={{ paddingLeft: depth * 20 + 8, maxWidth: 200 }}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="truncate text-sm cursor-default">{item.description}</div>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-md whitespace-normal">
+              {item.description}
+            </TooltipContent>
+          </Tooltip>
+        </TableCell>
         <TableCell className="text-xs">{item.unit}</TableCell>
         <TableCell className="text-right text-xs">{item.quantity}</TableCell>
         <TableCell className="text-right text-xs text-blue-600">
           {item.engineerEstimate ? fmt(item.engineerEstimate.extendedPrice) : ""}
         </TableCell>
-        {bidderNames.map((n) => (
-          <TableCell key={n} className="text-right text-xs">
-            {item.bids[n] ? fmt(item.bids[n].extendedPrice) : ""}
-          </TableCell>
-        ))}
+        {bidderNames.map((n) => {
+          const bid = item.bids[n];
+          return (
+            <React.Fragment key={n}>
+              <TableCell className="text-right text-xs text-muted-foreground">
+                {bid?.unitPrice != null ? fmt(bid.unitPrice) : ""}
+              </TableCell>
+              <TableCell className="text-right text-xs font-medium">
+                {bid?.extendedPrice != null ? fmt(bid.extendedPrice) : ""}
+              </TableCell>
+            </React.Fragment>
+          );
+        })}
       </TableRow>
       {item.subItems?.map((sub, i) => (
         <ItemRows key={i} item={sub} bidderNames={bidderNames} depth={depth + 1} />
@@ -225,6 +250,7 @@ export default function ReviewPage() {
   const engineerEstimate = fullData?.engineerEstimate as { total: number } | undefined;
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b px-6 py-3 flex items-center gap-4">
@@ -276,24 +302,27 @@ export default function ReviewPage() {
         </div>
       )}
 
-      {/* Split view: PDF left, data right */}
-      <div className="flex-1 flex">
-        {/* PDF — single page image */}
-        <div className="w-1/2 border-r overflow-auto bg-muted/30">
-          {pdfName && page && (
-            <img
-              src={`/api/pdf-page/${pdfName}/${page.pageNumber}`}
-              alt={`Page ${page.pageNumber}`}
-              className="w-full"
-            />
-          )}
-          {!page && pdfName && (
-            <iframe src={`/api/pdf/${pdfName}`} className="w-full h-full" title="PDF" />
-          )}
-        </div>
+      {/* Split view: resizable PDF left, data right */}
+      <ResizablePanelGroup direction="horizontal" className="flex-1">
+        <ResizablePanel defaultSize={45} minSize={20}>
+          <div className="h-full overflow-auto bg-muted/30">
+            {pdfName && page && (
+              <img
+                src={`/api/pdf-page/${pdfName}/${page.pageNumber}`}
+                alt={`Page ${page.pageNumber}`}
+                className="w-full"
+              />
+            )}
+            {!page && pdfName && (
+              <iframe src={`/api/pdf/${pdfName}`} className="w-full h-full" title="PDF" />
+            )}
+          </div>
+        </ResizablePanel>
 
-        {/* Extracted data */}
-        <div className="w-1/2 overflow-y-auto p-6">
+        <ResizableHandle withHandle />
+
+        <ResizablePanel defaultSize={55} minSize={20}>
+          <div className="h-full overflow-y-auto p-6">
           {/* Aggregate view */}
           {showAggregate && fullData && (
             <div className="space-y-4">
@@ -407,8 +436,10 @@ export default function ReviewPage() {
           {pages.length === 0 && fullData && (
             <BidRankingPage data={fullData} />
           )}
-        </div>
-      </div>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
+    </TooltipProvider>
   );
 }

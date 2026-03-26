@@ -1,0 +1,53 @@
+[    1473ms] [ERROR] React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. asChild aschild @ http://localhost:3001/_next/static/chunks/0nno_next_dist_12umvk~._.js:3272
+[  103112ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/review/56?_rsc=9nkij:0
+[  103522ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3001/review/56:0
+[  103817ms] Invalid or unexpected token
+[  103829ms] Error: ./ui/src/app/review/[name]/page.tsx:148:9
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  146 |           )}
+  147 |         </div>
+> 148 |       ))}
+      |         ^
+  149 |
+  150 |       {totals && (
+  151 |         <div className="border-t-2 pt-3 flex gap-6">
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./ui/src/app/review/[name]/page.tsx [Client Component Browser]
+    ./ui/src/app/review/[name]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./ui/src/app/review/[name]/page.tsx [Client Component SSR]
+    ./ui/src/app/review/[name]/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./ui/src/app/review/[name]/page.tsx:148:9)
+    at Object.getCompilationErrors (file:///Users/mauriciopiber/Projects/edge/bid-extract/ui/node_modules/.pnpm/next@16.2.1_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/mauriciopiber/Projects/edge/bid-extract/ui/node_modules/.pnpm/next@16.2.1_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/mauriciopiber/Projects/edge/bid-extract/ui/node_modules/.pnpm/next@16.2.1_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/mauriciopiber/Projects/edge/bid-extract/ui/node_modules/.pnpm/next@16.2.1_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/mauriciopiber/Projects/edge/bid-extract/ui/node_modules/.pnpm/next@16.2.1_@babel+core@7.29.0_@playwright+test@1.58.2_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/next/dist/server/base-server.js:1745:26)
+[  103983ms] [ERROR] ./ui/src/app/review/[name]/page.tsx:148:9
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  146 |           )}
+  147 |         </div>
+> 148 |       ))}
+      |         ^
+  149 |
+  150 |       {totals && (
+  151 |         <div className="border-t-2 pt-3 flex gap-6">
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./ui/src/app/review/[name]/page.tsx [Client Component Browser]
+    ./ui/src/app/review/[name]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./ui/src/app/review/[name]/page.tsx [Client Component SSR]
+    ./ui/src/app/review/[name]/page.tsx [Server Component] @ http://localhost:3001/_next/static/chunks/0nno_next_dist_02d~se2._.js:1945
+[  124766ms] [ERROR] React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. asChild aschild @ http://localhost:3001/_next/static/chunks/0nno_next_dist_12umvk~._.js:3272
