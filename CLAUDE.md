@@ -121,6 +121,13 @@ ui/                  # Next.js review UI
 
 - **NEVER GUESS OR INFER DATA.** Only use values that are explicitly visible in the document. No keyword-based categorization, no heuristic grouping, no back-calculating values. If the PDF shows sections like "Bridge Items" and "Roadway Items", extract those exact labels. If it doesn't show sections, don't invent them.
 - **NEVER FABRICATE STRUCTURE.** If the document doesn't have categories, subtotals, or groupings, don't create them. Only show what the PDF actually contains.
+- **HUMAN APPROVES ALL NEW CONCEPTS.** The LLM proposes, the human confirms. This applies to:
+  - New page types — if the classifier sees something that doesn't match known types, it goes to "pending" status. A human reviews and either approves it as a new type or maps it to an existing one.
+  - New layouts — when a new fingerprint is detected, the layout starts as "discovered" and needs human confirmation before the system invests in prompt evolution.
+  - Format reclassifications — if the system wants to change a layout's format type, a human must approve.
+  - Prompt promotions — new prompt versions must be scored AND human-approved before becoming active.
+
+  **Why:** LLMs hallucinate categories. A slightly different bid tabulation is NOT a new page type — it's the same type with variation. Without human gates, the system pollutes itself with noise categories that fragment the learning. Every new concept should be a deliberate decision, not an LLM side effect.
 
 ## Design Principles
 

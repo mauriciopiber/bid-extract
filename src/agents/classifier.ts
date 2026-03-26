@@ -46,7 +46,11 @@ const client = new Anthropic();
 
 /** Build classification prompt dynamically from DB page types */
 async function buildPagePrompt(): Promise<string> {
-	const types = await db.select().from(schema.pageTypes);
+	const { eq } = await import("drizzle-orm");
+	const types = await db
+		.select()
+		.from(schema.pageTypes)
+		.where(eq(schema.pageTypes.status, "approved"));
 
 	const typeList = types.length > 0
 		? types.map((t) => `- "${t.name}": ${t.description}`).join("\n")

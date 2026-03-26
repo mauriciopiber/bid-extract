@@ -49,6 +49,8 @@ export const pageTypes = pgTable("page_types", {
 	id: serial().primaryKey(),
 	name: text().notNull().unique(),
 	description: text().notNull(),
+	/** approved = usable, pending = needs human confirmation */
+	status: text().notNull().default("approved"),
 	/** Example: what does this page type look like? */
 	examples: text(),
 	createdAt: timestamp("created_at").notNull().defaultNow(),
