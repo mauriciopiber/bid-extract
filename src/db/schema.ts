@@ -44,6 +44,17 @@ export const evolutionTriggerEnum = pgEnum("evolution_trigger", [
 
 // -- Tables --
 
+/** Known page types — grows as we discover new ones */
+export const pageTypes = pgTable("page_types", {
+	id: serial().primaryKey(),
+	name: text().notNull().unique(),
+	description: text().notNull(),
+	/** Example: what does this page type look like? */
+	examples: text(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+
 /** A unique document layout / structure fingerprint */
 export const layouts = pgTable("layouts", {
 	id: serial().primaryKey(),
