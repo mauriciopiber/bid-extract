@@ -6,8 +6,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 // -- Types --
 
@@ -26,10 +25,7 @@ interface BidderInfo {
   address?: string;
 }
 
-interface BidValue {
-  unitPrice?: number;
-  extendedPrice?: number;
-}
+interface BidValue { unitPrice?: number; extendedPrice?: number }
 
 interface Item {
   itemNo: string | number;
@@ -47,18 +43,6 @@ interface Section {
   subtotals?: Record<string, number>;
 }
 
-interface BidGroup {
-  type: string;
-  name: string;
-  sections: Section[];
-  totals?: Record<string, number>;
-}
-
-interface Contract {
-  name: string;
-  bidGroups: BidGroup[];
-}
-
 // -- Helpers --
 
 function fmt(n: unknown): string {
@@ -66,123 +50,103 @@ function fmt(n: unknown): string {
   return "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// -- Aggregate View Components --
+// -- Page Type Components --
 
-function BidderRanking({ bidders, engineerEstimate }: { bidders: BidderInfo[]; engineerEstimate?: { total: number } }) {
+function BidRankingPage({ data }: { data: Record<string, unknown> }) {
+  const bidders = (data.bidders as BidderInfo[]) ?? [];
+  const project = data.project as Record<string, string> | undefined;
+
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">Bid Ranking</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {engineerEstimate && (
-          <div className="flex items-center justify-between py-2 px-3 bg-blue-50 rounded mb-2">
-            <span className="text-sm text-blue-700 font-medium">Engineer&apos;s Estimate</span>
-            <span className="font-bold text-blue-700">{fmt(engineerEstimate.total)}</span>
-          </div>
-        )}
-        <Table>
-          <TableBody>
-            {bidders.map((b) => (
-              <TableRow key={b.rank}>
-                <TableCell className="w-10">
-                  <Badge variant="outline">#{b.rank}</Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium">{b.name}</div>
-                  {b.address && <div className="text-xs text-muted-foreground">{b.address}</div>}
-                </TableCell>
-                <TableCell className="text-right font-bold text-green-700">
-                  {fmt(b.totalBaseBid)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ContractView({ contract, bidderNames }: { contract: Contract; bidderNames: string[] }) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm">{contract.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {contract.bidGroups.map((group, gi) => (
-          <BidGroupView key={gi} group={group} bidderNames={bidderNames} />
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function BidGroupView({ group, bidderNames }: { group: BidGroup; bidderNames: string[] }) {
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-2">
-        <span className="font-medium text-sm">{group.name}</span>
-        <Badge variant="outline" className="text-xs">{group.type}</Badge>
-      </div>
-
-      {group.sections.map((section, si) => (
-        <SectionView key={si} section={section} bidderNames={bidderNames} />
-      ))}
-
-      {group.totals && Object.keys(group.totals).length > 0 && (
-        <div className="border-t-2 pt-2 mt-2">
-          <div className="flex flex-wrap gap-4">
-            {Object.entries(group.totals).map(([name, total]) => (
-              <div key={name} className="text-sm">
-                <span className="text-muted-foreground">{name}: </span>
-                <span className="font-bold">{fmt(total)}</span>
-              </div>
-            ))}
-          </div>
+    <div className="space-y-4">
+      {project?.name && (
+        <div>
+          <h2 className="text-lg font-bold">{project.name}</h2>
+          {project.owner && <p className="text-sm text-muted-foreground">{project.owner}</p>}
+          {project.bidDate && <p className="text-sm text-muted-foreground">{project.bidDate}</p>}
+          {project.projectId && <p className="text-xs text-muted-foreground font-mono">{project.projectId}</p>}
         </div>
       )}
-    </div>
-  );
-}
-
-function SectionView({ section, bidderNames }: { section: Section; bidderNames: string[] }) {
-  return (
-    <div className="mb-4">
-      {section.name && (
-        <div className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-1">
-          {section.name}
-        </div>
-      )}
-
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-12">#</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead className="w-16">Unit</TableHead>
-            <TableHead className="w-16 text-right">Qty</TableHead>
-            <TableHead className="text-right">Eng Est</TableHead>
-            {bidderNames.map((name) => (
-              <TableHead key={name} className="text-right">
-                {name.length > 15 ? name.slice(0, 15) + "…" : name}
-              </TableHead>
-            ))}
+            <TableHead className="w-16">Rank</TableHead>
+            <TableHead>Bidder</TableHead>
+            <TableHead className="text-right">Total Bid</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {section.items.map((item, ii) => (
-            <ItemRow key={ii} item={item} bidderNames={bidderNames} />
+          {bidders.map((b, i) => (
+            <TableRow key={i}>
+              <TableCell><Badge variant="outline">#{b.rank}</Badge></TableCell>
+              <TableCell>
+                <div className="font-medium">{b.name}</div>
+                {b.address && <div className="text-xs text-muted-foreground">{b.address}</div>}
+              </TableCell>
+              <TableCell className="text-right font-bold text-green-700 text-lg">{fmt(b.totalBaseBid)}</TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
+    </div>
+  );
+}
 
-      {section.subtotals && Object.keys(section.subtotals).length > 0 && (
-        <div className="flex gap-4 mt-1 text-xs text-muted-foreground border-t pt-1">
-          <span className="font-medium">Subtotal:</span>
-          {Object.entries(section.subtotals).map(([name, total]) => (
-            <span key={name}>{name}: <strong>{fmt(total)}</strong></span>
+function BidTabulationPage({ data }: { data: Record<string, unknown> }) {
+  const sections = (data.sections as Section[]) ?? [];
+  const bidderNames = (data.bidders as string[]) ?? [];
+  const totals = data.totals as Record<string, number> | undefined;
+
+  return (
+    <div className="space-y-4">
+      {data.bidGroupName && (
+        <div className="flex items-center gap-2">
+          <h2 className="font-bold">{data.bidGroupName as string}</h2>
+          <Badge variant="outline">{data.bidGroupType as string}</Badge>
+        </div>
+      )}
+
+      {sections.map((section, si) => (
+        <div key={si}>
+          {section.name && (
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-2">{section.name}</h3>
+          )}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="w-14">Unit</TableHead>
+                <TableHead className="w-14 text-right">Qty</TableHead>
+                <TableHead className="text-right">Eng Est</TableHead>
+                {bidderNames.map((n) => (
+                  <TableHead key={n} className="text-right">{n.length > 20 ? n.slice(0, 20) + "…" : n}</TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {section.items.map((item, ii) => (
+                <ItemRows key={ii} item={item} bidderNames={bidderNames} />
+              ))}
+            </TableBody>
+          </Table>
+          {section.subtotals && (
+            <div className="flex gap-4 text-xs text-muted-foreground border-t pt-1 mt-1">
+              <span className="font-bold">Subtotal:</span>
+              {Object.entries(section.subtotals).map(([n, t]) => (
+                <span key={n}>{n}: <strong className="text-foreground">{fmt(t)}</strong></span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {totals && (
+        <div className="border-t-2 pt-3 flex gap-6">
+          {Object.entries(totals).map(([n, t]) => (
+            <div key={n}>
+              <div className="text-xs text-muted-foreground">{n}</div>
+              <div className="font-bold text-lg text-green-700">{fmt(t)}</div>
+            </div>
           ))}
         </div>
       )}
@@ -190,238 +154,165 @@ function SectionView({ section, bidderNames }: { section: Section; bidderNames: 
   );
 }
 
-function ItemRow({ item, bidderNames, indent = 0 }: { item: Item; bidderNames: string[]; indent?: number }) {
+function ItemRows({ item, bidderNames, depth = 0 }: { item: Item; bidderNames: string[]; depth?: number }) {
   return (
     <>
-      <TableRow className={indent > 0 ? "text-muted-foreground" : ""}>
-        <TableCell className="font-mono text-xs">{indent > 0 ? "  " : ""}{item.itemNo}</TableCell>
-        <TableCell style={{ paddingLeft: indent * 16 + 8 }}>
-          <span className="text-sm">{item.description}</span>
-        </TableCell>
+      <TableRow className={depth > 0 ? "text-muted-foreground text-xs" : ""}>
+        <TableCell className="font-mono text-xs">{item.itemNo}</TableCell>
+        <TableCell style={{ paddingLeft: depth * 20 + 8 }}>{item.description}</TableCell>
         <TableCell className="text-xs">{item.unit}</TableCell>
         <TableCell className="text-right text-xs">{item.quantity}</TableCell>
         <TableCell className="text-right text-xs text-blue-600">
           {item.engineerEstimate ? fmt(item.engineerEstimate.extendedPrice) : ""}
         </TableCell>
-        {bidderNames.map((name) => {
-          const bid = item.bids[name];
-          return (
-            <TableCell key={name} className="text-right text-xs">
-              {bid ? fmt(bid.extendedPrice) : ""}
-            </TableCell>
-          );
-        })}
+        {bidderNames.map((n) => (
+          <TableCell key={n} className="text-right text-xs">
+            {item.bids[n] ? fmt(item.bids[n].extendedPrice) : ""}
+          </TableCell>
+        ))}
       </TableRow>
-      {item.subItems?.map((sub, si) => (
-        <ItemRow key={si} item={sub} bidderNames={bidderNames} indent={indent + 1} />
+      {item.subItems?.map((sub, i) => (
+        <ItemRows key={i} item={sub} bidderNames={bidderNames} depth={depth + 1} />
       ))}
     </>
   );
 }
 
-// -- Page View Components --
-
-function PageCard({ page }: { page: PageData }) {
+function CoverPage({ data }: { data: Record<string, unknown> }) {
+  const project = data.project as Record<string, string> | undefined;
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-sm">Page {page.pageNumber}</CardTitle>
-          <Badge variant="outline">{page.pageType}</Badge>
-          {page.confidence != null && (
-            <span className="text-xs text-muted-foreground">
-              {Math.round(page.confidence * 100)}%
-            </span>
-          )}
+    <div className="space-y-2">
+      {project && Object.entries(project).map(([k, v]) => (
+        <div key={k} className="text-sm">
+          <span className="text-muted-foreground capitalize">{k}: </span>{v}
         </div>
-        {page.notes && <p className="text-xs text-muted-foreground mt-1">{page.notes}</p>}
-      </CardHeader>
-      <CardContent>
-        <PageDataView data={page.data} pageType={page.pageType} />
-      </CardContent>
-    </Card>
+      ))}
+      {data.engineer && <div className="text-sm"><span className="text-muted-foreground">Engineer: </span>{data.engineer as string}</div>}
+    </div>
   );
 }
 
-function PageDataView({ data, pageType }: { data: Record<string, unknown>; pageType: string }) {
-  if (pageType === "bid_ranking") {
-    const bidders = (data.bidders as BidderInfo[]) ?? [];
-    return (
-      <Table>
-        <TableBody>
-          {bidders.map((b, i) => (
-            <TableRow key={i}>
-              <TableCell><Badge variant="outline">#{b.rank}</Badge></TableCell>
-              <TableCell className="font-medium">{b.name}</TableCell>
-              <TableCell className="text-right font-bold text-green-700">{fmt(b.totalBaseBid)}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
-  }
-
-  if (pageType === "bid_tabulation") {
-    const sections = (data.sections as Section[]) ?? [];
-    const bidders = (data.bidders as string[]) ?? [];
-    return (
-      <div className="space-y-3">
-        {data.bidGroupName && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{data.bidGroupName as string}</span>
-            <Badge variant="outline" className="text-xs">{data.bidGroupType as string}</Badge>
-          </div>
-        )}
-        {sections.map((section, si) => (
-          <SectionView key={si} section={section} bidderNames={bidders} />
-        ))}
-        {data.totals && (
-          <div className="border-t pt-2 flex gap-4 text-sm">
-            {Object.entries(data.totals as Record<string, number>).map(([name, total]) => (
-              <span key={name}><span className="text-muted-foreground">{name}:</span> <strong>{fmt(total)}</strong></span>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (pageType === "cover") {
-    const project = data.project as Record<string, string> | undefined;
-    return (
-      <div className="space-y-1 text-sm">
-        {project && Object.entries(project).map(([k, v]) => (
-          <div key={k}><span className="text-muted-foreground capitalize">{k}:</span> {v}</div>
-        ))}
-        {data.engineer && <div><span className="text-muted-foreground">Engineer:</span> {data.engineer as string}</div>}
-      </div>
-    );
-  }
-
-  return <pre className="text-xs bg-muted p-3 rounded overflow-auto">{JSON.stringify(data, null, 2)}</pre>;
+function GenericPage({ data }: { data: Record<string, unknown> }) {
+  return <pre className="text-xs bg-muted p-3 rounded overflow-auto max-h-96">{JSON.stringify(data, null, 2)}</pre>;
 }
 
-// -- Main Review Page --
+// -- Main --
 
 export default function ReviewPage() {
   const { name } = useParams();
   const [pages, setPages] = useState<PageData[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
   const [fullData, setFullData] = useState<Record<string, unknown> | null>(null);
   const [evalData, setEvalData] = useState<{ mathScore: number | null; completenessScore: number | null; overallScore: number | null } | null>(null);
-  const [logs, setLogs] = useState<{ step: string; level: string; message: string }[]>([]);
   const [sourceFile, setSourceFile] = useState("");
 
   useEffect(() => {
-    fetch(`/api/extractions/${name}/pages`).then((r) => r.json()).then(setPages);
+    fetch(`/api/extractions/${name}/pages`).then((r) => r.json()).then((p: PageData[]) => {
+      setPages(p);
+      setCurrentPage(0);
+    });
     fetch(`/api/extractions/${name}`).then((r) => r.json()).then((d) => {
       setFullData(d);
       setEvalData(d._eval);
-      setLogs(d._logs ?? []);
       setSourceFile(d.sourceFile ?? "");
     });
   }, [name]);
 
-  const bidders = (fullData?.bidders as BidderInfo[]) ?? [];
-  const contracts = (fullData?.contracts as Contract[]) ?? [];
-  const engineerEstimate = fullData?.engineerEstimate as { total: number } | undefined;
-  const project = fullData?.project as Record<string, string> | undefined;
-  const bidderNames = bidders.map((b) => b.name);
+  const page = pages[currentPage];
   const pdfName = sourceFile.replace(".pdf", "");
+  const bidders = (fullData?.bidders as BidderInfo[]) ?? [];
+  const engineerEstimate = fullData?.engineerEstimate as { total: number } | undefined;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b px-6 py-4">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-muted-foreground hover:text-foreground text-sm">&larr;</Link>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold">{project?.name ?? `Extraction #${name}`}</h1>
-            {project?.owner && <p className="text-sm text-muted-foreground">{project.owner} {project.bidDate ? `— ${project.bidDate}` : ""}</p>}
-          </div>
-          {evalData && (
-            <div className="flex gap-2">
-              <Badge variant="outline">math {evalData.mathScore}%</Badge>
-              <Badge variant="outline">complete {evalData.completenessScore}%</Badge>
-              <Badge className={`${(evalData.overallScore ?? 0) >= 90 ? "bg-green-600" : (evalData.overallScore ?? 0) >= 70 ? "bg-yellow-600" : "bg-red-600"}`}>
-                {evalData.overallScore}%
-              </Badge>
-            </div>
+      <header className="border-b px-6 py-3 flex items-center gap-4">
+        <Link href="/" className="text-muted-foreground hover:text-foreground">&larr;</Link>
+        <h1 className="font-bold">Extraction #{name}</h1>
+
+        {/* Summary bar */}
+        <div className="flex gap-3 ml-4 text-sm">
+          {engineerEstimate && (
+            <span className="text-blue-600">Eng Est: <strong>{fmt(engineerEstimate.total)}</strong></span>
           )}
+          {bidders.filter(b => b.totalBaseBid).map((b) => (
+            <span key={b.rank}>#{b.rank} {b.name.split(/[,\s]/)[0]}: <strong className="text-green-700">{fmt(b.totalBaseBid)}</strong></span>
+          ))}
         </div>
+
+        {evalData && (
+          <div className="flex gap-1 ml-auto">
+            <Badge variant="outline" className="text-xs">math {evalData.mathScore}%</Badge>
+            <Badge variant="outline" className="text-xs">comp {evalData.completenessScore}%</Badge>
+            <Badge className={`text-xs ${(evalData.overallScore ?? 0) >= 90 ? "bg-green-600" : "bg-yellow-600"}`}>
+              {evalData.overallScore}%
+            </Badge>
+          </div>
+        )}
       </header>
 
-      {/* Pipeline steps */}
-      {logs.length > 0 && (
-        <div className="px-6 py-2 border-b bg-muted/50 flex gap-3 overflow-x-auto text-xs text-muted-foreground">
-          {logs.map((l, i) => (
-            <span key={i} className={l.level === "error" ? "text-red-500" : ""}>
-              [{l.step}] {l.message}
-            </span>
+      {/* Page navigation */}
+      {pages.length > 0 && (
+        <div className="border-b px-6 py-2 flex items-center gap-2">
+          {pages.map((p, i) => (
+            <Button
+              key={p.pageNumber}
+              variant={i === currentPage ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCurrentPage(i)}
+            >
+              P{p.pageNumber}
+              <Badge variant="secondary" className="ml-1 text-[10px]">{p.pageType.replace("bid_", "")}</Badge>
+            </Button>
           ))}
         </div>
       )}
 
-      <main className="p-6">
-        <Tabs defaultValue="pages">
-          <TabsList>
-            <TabsTrigger value="pages">Pages ({pages.length})</TabsTrigger>
-            <TabsTrigger value="aggregate">Aggregate</TabsTrigger>
-          </TabsList>
+      {/* Split view: PDF left, data right */}
+      <div className="flex-1 flex">
+        {/* PDF */}
+        <div className="w-1/2 border-r">
+          {pdfName && page && (
+            <iframe
+              src={`/api/pdf/${pdfName}#page=${page.pageNumber}`}
+              className="w-full h-full"
+              title={`Page ${page?.pageNumber}`}
+            />
+          )}
+          {!page && pdfName && (
+            <iframe src={`/api/pdf/${pdfName}`} className="w-full h-full" title="PDF" />
+          )}
+        </div>
 
-          {/* Tab: Pages — page by page review */}
-          <TabsContent value="pages" className="space-y-4 mt-4">
-            {pages.map((page) => (
-              <div key={page.pageNumber} className="grid grid-cols-2 gap-4">
-                {/* PDF page */}
-                <Card>
-                  <CardContent className="p-0">
-                    <iframe
-                      src={`/api/pdf/${pdfName}#page=${page.pageNumber}`}
-                      className="w-full h-[700px] rounded"
-                      title={`Page ${page.pageNumber}`}
-                    />
-                  </CardContent>
-                </Card>
-
-                {/* Extracted data */}
-                <PageCard page={page} />
+        {/* Extracted data */}
+        <div className="w-1/2 overflow-y-auto p-6">
+          {page && (
+            <>
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="font-bold">Page {page.pageNumber}</h2>
+                <Badge>{page.pageType}</Badge>
+                {page.confidence != null && (
+                  <span className="text-xs text-muted-foreground">{Math.round(page.confidence * 100)}%</span>
+                )}
               </div>
-            ))}
 
-            {pages.length === 0 && fullData && (
-              <Card>
-                <CardContent className="grid grid-cols-2 gap-4 p-4">
-                  <iframe
-                    src={`/api/pdf/${pdfName}`}
-                    className="w-full h-[700px] rounded border"
-                    title="PDF"
-                  />
-                  <div>
-                    <BidderRanking bidders={bidders} engineerEstimate={engineerEstimate} />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
+              {page.notes && (
+                <p className="text-xs text-muted-foreground mb-4">{page.notes}</p>
+              )}
 
-          {/* Tab: Aggregate — combined result */}
-          <TabsContent value="aggregate" className="space-y-4 mt-4">
-            <BidderRanking bidders={bidders} engineerEstimate={engineerEstimate} />
+              {page.pageType === "bid_ranking" && <BidRankingPage data={page.data} />}
+              {page.pageType === "bid_tabulation" && <BidTabulationPage data={page.data} />}
+              {page.pageType === "cover" && <CoverPage data={page.data} />}
+              {!["bid_ranking", "bid_tabulation", "cover"].includes(page.pageType) && <GenericPage data={page.data} />}
+            </>
+          )}
 
-            {contracts.map((contract, ci) => (
-              <ContractView key={ci} contract={contract} bidderNames={bidderNames} />
-            ))}
-
-            {contracts.length === 0 && bidders.length > 0 && (
-              <Card>
-                <CardContent className="p-4 text-sm text-muted-foreground">
-                  No line items extracted — this is a bid ranking only.
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
-      </main>
+          {/* Fallback for old extractions without pages */}
+          {pages.length === 0 && fullData && (
+            <BidRankingPage data={fullData} />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
