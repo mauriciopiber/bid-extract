@@ -151,6 +151,14 @@ ui/                  # Next.js review UI
 
   **Why:** LLMs hallucinate categories. A slightly different bid tabulation is NOT a new page type — it's the same type with variation. Without human gates, the system pollutes itself with noise categories that fragment the learning. Every new concept should be a deliberate decision, not an LLM side effect.
 
+- **NEVER REPLACE — ALWAYS EXTEND.** When adding a new feature or refactoring:
+  - Keep the old code path working until the new one is proven
+  - Add the new path alongside, not instead of
+  - Only remove the old path after all tests pass with the new one
+  - If a schema change breaks old data, wipe extractions cleanly (`pnpm cli reset`) rather than leaving stale data that corrupts the UI
+
+- **CLEAN SLATE ON STRUCTURAL CHANGES.** When the schema or pipeline changes structurally, wipe extraction data. Old extractions in a different format are noise — they confuse the UI, corrupt scoring, and waste review time. Keep: docs, prompts, page types, learnings. Wipe: extractions, evals, logs, layouts, documents, clients.
+
 ## Design Principles
 
 - **Vision-first** — Classification and extraction use page images via Claude vision API. Text extraction alone can't handle the format diversity or handwritten values.

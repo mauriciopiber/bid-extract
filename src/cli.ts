@@ -96,6 +96,19 @@ program
 		});
 	});
 
+program
+	.command("reset")
+	.description("Wipe all extraction data (keeps page types, prompts learning)")
+	.action(async () => {
+		const { sql } = await import("drizzle-orm");
+		const { db } = await import("./db/index.js");
+		await db.execute(
+			sql`TRUNCATE run_logs, page_extractions, evals, contests, prompt_evolutions, extractions, documents, clients, layouts CASCADE`,
+		);
+		console.log("Wiped: extractions, evals, logs, layouts, documents, clients");
+		console.log("Kept: page_types");
+	});
+
 // -- Gear commands --
 
 program
