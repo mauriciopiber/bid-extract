@@ -171,9 +171,49 @@ export async function extractPage(
 			break;
 	}
 
+	// Step 1: Count items first (anchors the model's expectation)
+	let itemCount: number | null = null;
+	if (classification.pageType === "bid_tabulation") {
+		const countResponse = await client.messages.create({
+			model: "claude-sonnet-4-20250514",
+			max_tokens: 256,
+			messages: [
+				{
+					role: "user",
+					content: [
+						{
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: "image/png",
+								data: pageImage.toString("base64"),
+							},
+						},
+						{
+							type: "text",
+							text: "Count the EXACT number of line item rows in this bid tabulation. Count every single numbered row. Also count any section headers and subtotal rows. Return ONLY a JSON object: {\"itemRows\": N, \"sections\": N}",
+						},
+					],
+				},
+			],
+		});
+		try {
+			const countText = countResponse.content[0].type === "text" ? countResponse.content[0].text : "";
+			const counts = parseJsonResponse<{ itemRows: number; sections: number }>(countText);
+			itemCount = counts.itemRows;
+		} catch {
+			// Count failed, proceed without it
+		}
+	}
+
+	// Step 2: Build extraction prompt with count anchor
+	if (itemCount && classification.pageType === "bid_tabulation") {
+		prompt += `\n\nCRITICAL: This page contains EXACTLY ${itemCount} line item rows. You MUST extract ALL ${itemCount} items. Do NOT stop early. I will verify the count.`;
+	}
+
 	const response = await client.messages.create({
 		model: "claude-sonnet-4-20250514",
-		max_tokens: 8192,
+		max_tokens: 16384,
 		messages: [
 			{
 				role: "user",
@@ -192,8 +232,40 @@ export async function extractPage(
 		],
 	});
 
-	const text =
+	let text =
 		response.content[0].type === "text" ? response.content[0].text : "";
+
+	// If truncated by max_tokens, request continuation
+	if (response.stop_reason === "max_tokens") {
+		const contResponse = await client.messages.create({
+			model: "claude-sonnet-4-20250514",
+			max_tokens: 16384,
+			messages: [
+				{
+					role: "user",
+					content: [
+						{
+							type: "image",
+							source: {
+								type: "base64",
+								media_type: "image/png",
+								data: pageImage.toString("base64"),
+							},
+						},
+						{ type: "text", text: prompt },
+					],
+				},
+				{ role: "assistant", content: text },
+				{
+					role: "user",
+					content: "Your response was cut off. Continue the JSON from exactly where you stopped. Do not repeat items already extracted.",
+				},
+			],
+		});
+		const contText = contResponse.content[0].type === "text" ? contResponse.content[0].text : "";
+		text += contText;
+	}
+
 	const data = parseJsonResponse<Record<string, unknown>>(text);
 
 	return {
