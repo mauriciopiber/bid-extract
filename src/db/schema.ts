@@ -221,6 +221,23 @@ export const promptEvolutions = pgTable("prompt_evolutions", {
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+/** Per-page extraction results */
+export const pageExtractions = pgTable("page_extractions", {
+	id: serial().primaryKey(),
+	extractionId: integer("extraction_id")
+		.references(() => extractions.id)
+		.notNull(),
+	pageNumber: integer("page_number").notNull(),
+	pageType: text("page_type").notNull(),
+	confidence: real(),
+	/** Raw extraction result for this page */
+	resultJson: jsonb("result_json"),
+	/** Page-level score */
+	score: real(),
+	notes: text(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 /** Step-by-step logs for each pipeline run */
 export const runLogs = pgTable("run_logs", {
 	id: serial().primaryKey(),

@@ -127,6 +127,22 @@ ui/                  # Next.js review UI
   - Format reclassifications — if the system wants to change a layout's format type, a human must approve.
   - Prompt promotions — new prompt versions must be scored AND human-approved before becoming active.
 
+- **PAGE-BY-PAGE EXTRACTION AND REVIEW.** The system works page by page, not document-level:
+  - Each page is classified independently
+  - Each page is extracted independently based on its page type
+  - Each page is reviewed independently (PDF page image left, extracted data right)
+  - Each page is contestable independently
+  - The final document result is a MERGE of page results — but the source of truth is the per-page data
+  - This makes review possible (you compare one page at a time) and handles multi-contract PDFs naturally
+
+  **Why:** A 4-page PDF dumped as one blob is impossible to verify. Page-by-page lets a human check each page against its extracted data. It also handles PDFs with different content types per page (cover + bid ranking + bid tabulation).
+
+- **HUMAN APPROVES ALL NEW CONCEPTS.** The LLM proposes, the human confirms. This applies to:
+  - New page types — if the classifier sees something that doesn't match known types, it goes to "pending" status. A human reviews and either approves it as a new type or maps it to an existing one.
+  - New layouts — when a new fingerprint is detected, the layout starts as "discovered" and needs human confirmation before the system invests in prompt evolution.
+  - Format reclassifications — if the system wants to change a layout's format type, a human must approve.
+  - Prompt promotions — new prompt versions must be scored AND human-approved before becoming active.
+
   **Why:** LLMs hallucinate categories. A slightly different bid tabulation is NOT a new page type — it's the same type with variation. Without human gates, the system pollutes itself with noise categories that fragment the learning. Every new concept should be a deliberate decision, not an LLM side effect.
 
 ## Design Principles
