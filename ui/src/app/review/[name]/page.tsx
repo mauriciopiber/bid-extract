@@ -202,6 +202,7 @@ export default function ReviewPage() {
   const { name } = useParams();
   const [pages, setPages] = useState<PageData[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [showAggregate, setShowAggregate] = useState(false);
   const [fullData, setFullData] = useState<Record<string, unknown> | null>(null);
   const [evalData, setEvalData] = useState<{ mathScore: number | null; completenessScore: number | null; overallScore: number | null } | null>(null);
   const [sourceFile, setSourceFile] = useState("");
@@ -257,14 +258,21 @@ export default function ReviewPage() {
           {pages.map((p, i) => (
             <Button
               key={p.pageNumber}
-              variant={i === currentPage ? "default" : "outline"}
+              variant={!showAggregate && i === currentPage ? "default" : "outline"}
               size="sm"
-              onClick={() => setCurrentPage(i)}
+              onClick={() => { setCurrentPage(i); setShowAggregate(false); }}
             >
               P{p.pageNumber}
               <Badge variant="secondary" className="ml-1 text-[10px]">{p.pageType.replace("bid_", "")}</Badge>
             </Button>
           ))}
+          <Button
+            variant={showAggregate ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowAggregate(true)}
+          >
+            Aggregate
+          </Button>
         </div>
       )}
 
@@ -286,7 +294,95 @@ export default function ReviewPage() {
 
         {/* Extracted data */}
         <div className="w-1/2 overflow-y-auto p-6">
-          {page && (
+          {/* Aggregate view */}
+          {showAggregate && fullData && (
+            <div className="space-y-4">
+              <h2 className="font-bold">Aggregate Result</h2>
+
+              {/* Ranking */}
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Bid Ranking</CardTitle></CardHeader>
+                <CardContent>
+                  {engineerEstimate && (
+                    <div className="flex justify-between py-2 px-3 bg-blue-50 rounded mb-2">
+                      <span className="text-sm text-blue-700">Engineer&apos;s Estimate</span>
+                      <span className="font-bold text-blue-700">{fmt(engineerEstimate.total)}</span>
+                    </div>
+                  )}
+                  <Table>
+                    <TableBody>
+                      {bidders.map((b) => (
+                        <TableRow key={b.rank}>
+                          <TableCell><Badge variant="outline">#{b.rank}</Badge></TableCell>
+                          <TableCell className="font-medium">{b.name}</TableCell>
+                          <TableCell className="text-right font-bold text-green-700">{fmt(b.totalBaseBid)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Contracts */}
+              {(fullData.contracts as { name: string; bidGroups: { type: string; name: string; sections: Section[]; totals?: Record<string, number> }[] }[])?.map((contract, ci) => (
+                <Card key={ci}>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm">{contract.name}</CardTitle></CardHeader>
+                  <CardContent className="space-y-4">
+                    {contract.bidGroups.map((group, gi) => (
+                      <div key={gi}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium text-sm">{group.name}</span>
+                          <Badge variant="outline" className="text-xs">{group.type}</Badge>
+                        </div>
+                        {group.sections.map((section, si) => (
+                          <div key={si} className="mb-3">
+                            {section.name && <h4 className="text-xs font-bold text-muted-foreground uppercase mb-1">{section.name}</h4>}
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead className="w-12">#</TableHead>
+                                  <TableHead>Description</TableHead>
+                                  <TableHead className="w-14">Unit</TableHead>
+                                  <TableHead className="w-14 text-right">Qty</TableHead>
+                                  <TableHead className="text-right">Eng Est</TableHead>
+                                  {bidders.map((b) => (
+                                    <TableHead key={b.rank} className="text-right">{b.name.length > 15 ? b.name.slice(0, 15) + "…" : b.name}</TableHead>
+                                  ))}
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {section.items.map((item, ii) => (
+                                  <ItemRows key={ii} item={item} bidderNames={bidders.map((b) => b.name)} />
+                                ))}
+                              </TableBody>
+                            </Table>
+                            {section.subtotals && (
+                              <div className="flex gap-4 text-xs text-muted-foreground border-t pt-1 mt-1">
+                                <span className="font-bold">Subtotal:</span>
+                                {Object.entries(section.subtotals).map(([n, t]) => (
+                                  <span key={n}>{n}: <strong className="text-foreground">{fmt(t)}</strong></span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {group.totals && (
+                          <div className="border-t-2 pt-2 flex gap-6">
+                            {Object.entries(group.totals).map(([n, t]) => (
+                              <div key={n}><div className="text-xs text-muted-foreground">{n}</div><div className="font-bold">{fmt(t)}</div></div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Page view */}
+          {!showAggregate && page && (
             <>
               <div className="flex items-center gap-2 mb-4">
                 <h2 className="font-bold">Page {page.pageNumber}</h2>
