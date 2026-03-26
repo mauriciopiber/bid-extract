@@ -11,8 +11,8 @@
  * This lets a human quickly verify extractions are correct.
  */
 
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
-import { join, basename } from "node:path";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { basename, join } from "node:path";
 import type { BidTabulation } from "../schemas/bid-tabulation.js";
 import { pdfToImages } from "../utils/pdf-to-images.js";
 

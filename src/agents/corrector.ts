@@ -22,15 +22,16 @@ export async function correctExtraction(
 		...warnings.map((w) => `WARNING: ${w}`),
 	];
 
-	const imageContent: Anthropic.Messages.ImageBlockParam[] =
-		pageImages.map((img) => ({
+	const imageContent: Anthropic.Messages.ImageBlockParam[] = pageImages.map(
+		(img) => ({
 			type: "image" as const,
 			source: {
 				type: "base64" as const,
 				media_type: "image/png" as const,
 				data: img.toString("base64"),
 			},
-		}));
+		}),
+	);
 
 	const prompt = `I previously extracted bid data from this document but the validation found issues.
 

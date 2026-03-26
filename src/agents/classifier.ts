@@ -58,15 +58,16 @@ export async function classifyDocument(
 	// Send first 2 pages max for classification
 	const imagesToSend = pageImages.slice(0, 2);
 
-	const imageContent: Anthropic.Messages.ImageBlockParam[] =
-		imagesToSend.map((img) => ({
+	const imageContent: Anthropic.Messages.ImageBlockParam[] = imagesToSend.map(
+		(img) => ({
 			type: "image" as const,
 			source: {
 				type: "base64" as const,
 				media_type: "image/png" as const,
 				data: img.toString("base64"),
 			},
-		}));
+		}),
+	);
 
 	const response = await client.messages.create({
 		model: "claude-sonnet-4-20250514",

@@ -6,10 +6,10 @@
  * in the prompt so the model learns from prior successes.
  */
 
-import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { FormatType } from "./schemas/bid-tabulation.js";
 import type { ClassificationResult } from "./agents/classifier.js";
+import type { FormatType } from "./schemas/bid-tabulation.js";
 import type { BidTabulation } from "./schemas/bid-tabulation.js";
 
 const REGISTRY_DIR = join(import.meta.dirname, "..", "registry");

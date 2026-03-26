@@ -24,15 +24,16 @@ export async function resolveContest(
 	// biome-ignore lint: dynamic extraction data
 	extractionData: any,
 ): Promise<ResolverResult> {
-	const imageContent: Anthropic.Messages.ImageBlockParam[] =
-		pageImages.map((img) => ({
+	const imageContent: Anthropic.Messages.ImageBlockParam[] = pageImages.map(
+		(img) => ({
 			type: "image" as const,
 			source: {
 				type: "base64" as const,
 				media_type: "image/png" as const,
 				data: img.toString("base64"),
 			},
-		}));
+		}),
+	);
 
 	const prompt = `I'm reviewing an extracted bid tabulation and a specific value has been contested as potentially incorrect.
 

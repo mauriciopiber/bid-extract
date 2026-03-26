@@ -9,11 +9,11 @@
  */
 
 import "dotenv/config";
-import { readdir, mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { Command } from "commander";
-import { resolveContest } from "./agents/contest-resolver.js";
 import { classifyDocument } from "./agents/classifier.js";
+import { resolveContest } from "./agents/contest-resolver.js";
 import { applyContest, getContests, updateContest } from "./contests.js";
 import { runPipeline } from "./pipeline.js";
 import { generateReport } from "./review/generate-report.js";
@@ -78,10 +78,7 @@ program
 
 						// Write output
 						const outPath = join(outputDir, `${name}.json`);
-						await writeFile(
-							outPath,
-							JSON.stringify(result.data, null, 2),
-						);
+						await writeFile(outPath, JSON.stringify(result.data, null, 2));
 
 						const status = result.finalValid ? "✓" : "⚠";
 						console.log(
@@ -124,6 +121,77 @@ program
 		console.log(`Handwriting: ${result.hasHandwriting}`);
 		console.log(`Eng. est.:   ${result.hasEngineerEstimate}`);
 		console.log(`Notes:       ${result.notes}`);
+	});
+
+program
+	.command("stats")
+	.description("Show accuracy stats from extracted data")
+	.option("-o, --output <dir>", "Output directory", "./output")
+	.action(async (options) => {
+		const outputDir = resolve(options.output);
+		const { readdir, readFile } = await import("node:fs/promises");
+
+		const files = await readdir(outputDir);
+		const jsonFiles = files.filter((f) => f.endsWith(".json"));
+
+		let total = 0;
+		let clean = 0;
+		let withWarnings = 0;
+		let totalMismatch = 0;
+		const byFormat: Record<string, { total: number; clean: number }> = {};
+
+		for (const file of jsonFiles) {
+			const content = await readFile(join(outputDir, file), "utf-8");
+			const data = JSON.parse(content);
+			total++;
+
+			const fmt = data.extraction?.formatType || "unknown";
+			if (!byFormat[fmt]) byFormat[fmt] = { total: 0, clean: 0 };
+			byFormat[fmt].total++;
+
+			const warnings = data.extraction?.warnings?.length ?? 0;
+			if (warnings === 0) {
+				clean++;
+				byFormat[fmt].clean++;
+			} else {
+				withWarnings++;
+			}
+
+			// Check total mismatch
+			for (const bidder of data.bidders || []) {
+				if (bidder.totalBaseBid && bidder.lineItems?.length > 0) {
+					const sum = bidder.lineItems.reduce(
+						(s: number, li: { extendedPrice?: number }) =>
+							s + (li.extendedPrice ?? 0),
+						0,
+					);
+					if (Math.abs(sum - bidder.totalBaseBid) > 1) {
+						totalMismatch++;
+						break;
+					}
+				}
+			}
+		}
+
+		console.log("=== Extraction Accuracy Stats ===\n");
+		console.log(`Total extracted:     ${total}`);
+		console.log(
+			`Clean (0 warnings):  ${clean} (${Math.round((clean / total) * 100)}%)`,
+		);
+		console.log(
+			`With warnings:       ${withWarnings} (${Math.round((withWarnings / total) * 100)}%)`,
+		);
+		console.log(
+			`Total mismatches:    ${totalMismatch} (${Math.round((totalMismatch / total) * 100)}%)`,
+		);
+		console.log(`\nBy format:`);
+		for (const [fmt, counts] of Object.entries(byFormat).sort(
+			(a, b) => b[1].total - a[1].total,
+		)) {
+			console.log(
+				`  ${fmt.padEnd(22)} ${counts.clean}/${counts.total} clean (${Math.round((counts.clean / counts.total) * 100)}%)`,
+			);
+		}
 	});
 
 program

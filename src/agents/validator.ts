@@ -23,9 +23,7 @@ export interface ValidationError {
 	actual?: string | number;
 }
 
-export function validateBidTabulation(
-	data: BidTabulation,
-): ValidationResult {
+export function validateBidTabulation(data: BidTabulation): ValidationResult {
 	const errors: ValidationError[] = [];
 	const warnings: string[] = [];
 
@@ -39,7 +37,8 @@ export function validateBidTabulation(
 					item.quantity !== undefined &&
 					item.extendedPrice !== undefined
 				) {
-					const expected = Math.round(item.unitPrice * item.quantity * 100) / 100;
+					const expected =
+						Math.round(item.unitPrice * item.quantity * 100) / 100;
 					if (Math.abs(expected - item.extendedPrice) > 0.01) {
 						warnings.push(
 							`${bidder.name} item ${item.itemNo}: ${item.unitPrice} × ${item.quantity} = ${expected}, got ${item.extendedPrice}`,

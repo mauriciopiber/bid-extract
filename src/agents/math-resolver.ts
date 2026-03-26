@@ -82,7 +82,11 @@ export function resolveMath(data: BidTabulation): MathResolution {
 	// Final total check
 	let totalMatches = true;
 	for (const bidder of data.bidders) {
-		if (bidder.totalBaseBid != null && bidder.lineItems && bidder.lineItems.length > 0) {
+		if (
+			bidder.totalBaseBid != null &&
+			bidder.lineItems &&
+			bidder.lineItems.length > 0
+		) {
 			const sum = bidder.lineItems.reduce(
 				(acc, item) => acc + (item.extendedPrice ?? 0),
 				0,
@@ -125,8 +129,7 @@ function resolveLineItem(
 	// - Extended prices are larger, more readable numbers
 	// - Quantities are usually round numbers or match the engineer estimate
 	// - Unit prices have the most decimal digits → most OCR error-prone
-	const correctedUnitPrice =
-		Math.round((extendedPrice / quantity) * 100) / 100;
+	const correctedUnitPrice = Math.round((extendedPrice / quantity) * 100) / 100;
 
 	// Verify the correction makes sense
 	const correctedExtended =

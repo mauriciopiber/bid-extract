@@ -8,3 +8,7 @@ output/
 samples/
 coverage/
 .DS_Store
+registry/
+contests/
+output/
+review.html

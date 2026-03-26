@@ -7,10 +7,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { buildFewShotPrompt, getExample } from "../registry.js";
-import type {
-	BidTabulation,
-	FormatType,
-} from "../schemas/bid-tabulation.js";
+import type { BidTabulation, FormatType } from "../schemas/bid-tabulation.js";
 import { parseJsonResponse } from "../utils/parse-json.js";
 import type { ClassificationResult } from "./classifier.js";
 
@@ -23,7 +20,7 @@ function buildExtractionPrompt(classification: ClassificationResult): string {
 		"summary-only": `This document only has bidder names and total amounts — no line item breakdown. Extract bidder names, totals, and ranks. Do NOT fabricate line items.`,
 		"engineering-firm": `This is a formal engineering bid form with item codes, descriptions, units, quantities, unit prices, and extended prices. May have schedules or sections.`,
 		"multi-section": `This document has a base bid section plus alternate bid sections. Extract the base bid AND each alternate separately.`,
-		"handwritten": `This document contains handwritten values. Read carefully. If a value is unclear, use your best interpretation and flag it in notes. Set confidence lower for uncertain values.`,
+		handwritten: `This document contains handwritten values. Read carefully. If a value is unclear, use your best interpretation and flag it in notes. Set confidence lower for uncertain values.`,
 		"submission-list": `This is just a list of submissions — supplier names and dates. Extract what's available. There may be no prices.`,
 		unknown: `Format is unknown. Extract whatever structured data you can find.`,
 	};
@@ -100,15 +97,16 @@ export async function extractBidData(
 ): Promise<BidTabulation> {
 	const startTime = Date.now();
 
-	const imageContent: Anthropic.Messages.ImageBlockParam[] =
-		pageImages.map((img) => ({
+	const imageContent: Anthropic.Messages.ImageBlockParam[] = pageImages.map(
+		(img) => ({
 			type: "image" as const,
 			source: {
 				type: "base64" as const,
 				media_type: "image/png" as const,
 				data: img.toString("base64"),
 			},
-		}));
+		}),
+	);
 
 	let prompt = buildExtractionPrompt(classification);
 

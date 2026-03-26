@@ -56,16 +56,12 @@ export async function runPipeline(
 		}
 	}
 
-	log(
-		`  → extracted ${data.bidders.length} bidders`,
-	);
+	log(`  → extracted ${data.bidders.length} bidders`);
 
 	// Step 4: Math resolver (deterministic, no LLM call)
 	const mathResult = resolveMath(data);
 	if (mathResult.corrected > 0) {
-		log(
-			`  → math resolver: fixed ${mathResult.corrected} values`,
-		);
+		log(`  → math resolver: fixed ${mathResult.corrected} values`);
 		for (const c of mathResult.corrections) {
 			log(`    ${c}`);
 		}
@@ -110,9 +106,7 @@ export async function runPipeline(
 				`    ${validation.errors.length} errors, ${validation.warnings.length} warnings remaining`,
 			);
 		} catch (err) {
-			log(
-				`    correction failed: ${err instanceof Error ? err.message : err}`,
-			);
+			log(`    correction failed: ${err instanceof Error ? err.message : err}`);
 			break;
 		}
 	}

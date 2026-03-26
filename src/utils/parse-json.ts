@@ -20,6 +20,8 @@ export function parseJsonResponse<T>(text: string): T {
 			return JSON.parse(text.slice(start, end + 1));
 		}
 
-		throw new Error(`Could not parse JSON from response: ${text.slice(0, 200)}`);
+		throw new Error(
+			`Could not parse JSON from response: ${text.slice(0, 200)}`,
+		);
 	}
 }

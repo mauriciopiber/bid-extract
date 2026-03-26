@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: bidextract
+      POSTGRES_PASSWORD: bidextract
+      POSTGRES_DB: bidextract
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - target: 5432
+        published: ${POSTGRES_PORT:-5460}
+        protocol: tcp
+    healthcheck:
+      test: [CMD, pg_isready, -U, bidextract]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local

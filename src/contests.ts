@@ -9,7 +9,7 @@
  *   open → resolving → resolved | unresolvable
  */
 
-import { readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const CONTESTS_DIR = join(import.meta.dirname, "..", "contests");
@@ -58,7 +58,9 @@ export async function createContest(
 		createdAt: new Date().toISOString(),
 	};
 
-	const safeName = sourceFile.replace(/\.pdf$/i, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+	const safeName = sourceFile
+		.replace(/\.pdf$/i, "")
+		.replace(/[^a-zA-Z0-9_-]/g, "_");
 	const dir = join(CONTESTS_DIR, safeName);
 	await mkdir(dir, { recursive: true });
 	await writeFile(join(dir, `${id}.json`), JSON.stringify(contest, null, 2));
@@ -100,7 +102,10 @@ export async function updateContest(contest: Contest): Promise<void> {
 		.replace(/\.pdf$/i, "")
 		.replace(/[^a-zA-Z0-9_-]/g, "_");
 	const dir = join(CONTESTS_DIR, safeName);
-	await writeFile(join(dir, `${contest.id}.json`), JSON.stringify(contest, null, 2));
+	await writeFile(
+		join(dir, `${contest.id}.json`),
+		JSON.stringify(contest, null, 2),
+	);
 }
 
 /**
