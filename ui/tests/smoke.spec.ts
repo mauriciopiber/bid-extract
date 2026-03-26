@@ -53,6 +53,44 @@ test("extraction pages API returns per-page data", async ({ request }) => {
 	expect(Array.isArray(pages)).toBe(true);
 });
 
+test("extraction detail shows bidder totals and engineer estimate", async ({ page }) => {
+	const res = await page.request.get("/api/extractions");
+	const extractions = await res.json();
+	if (extractions.length === 0) {
+		test.skip();
+		return;
+	}
+
+	// Find an extraction that has bidders with totals
+	const extRes = await page.request.get(`/api/extractions/${extractions[0].id}`);
+	const data = await extRes.json();
+	const hasBidderTotal = data.bidders?.some((b: { totalBaseBid?: number }) => b.totalBaseBid != null);
+	const hasEngEstimate = data.engineerEstimate?.total != null;
+
+	if (!hasBidderTotal && !hasEngEstimate) {
+		test.skip();
+		return;
+	}
+
+	await page.goto(`/review/${extractions[0].id}`);
+	await page.waitForTimeout(1000);
+
+	const body = await page.locator("body").textContent();
+
+	// If bidder has a total, it MUST appear in the UI
+	if (hasBidderTotal) {
+		const total = data.bidders.find((b: { totalBaseBid?: number }) => b.totalBaseBid)?.totalBaseBid;
+		// Check the dollar amount appears somewhere on the page
+		expect(body).toContain(total.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+	}
+
+	// If engineer estimate exists, it MUST appear in the UI
+	if (hasEngEstimate) {
+		const engTotal = data.engineerEstimate.total;
+		expect(body).toContain(engTotal.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+	}
+});
+
 test("layout detail page loads", async ({ page }) => {
 	const res = await page.request.get("/api/layouts");
 	const layouts = await res.json();

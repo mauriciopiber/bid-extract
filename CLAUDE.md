@@ -115,6 +115,8 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 
 9. **CONTEXT PASSING BETWEEN PAGES.** Page 1 establishes bidder names. Pages 2+ receive those names so they map to the SAME bidders. The merge uses bidder name as identity key.
 
+10. **THE UI IS THE SOURCE OF TRUTH.** If data exists in the DB but doesn't show in the UI, it doesn't exist. Every pipeline change MUST flow through to the UI. Every claim ("totals are present") MUST be verified by checking the UI, not just the DB. Add Playwright tests for every data point that matters. If the UI can't show it, the feature is not done.
+
 ## Testing
 
 - **Unit tests** (vitest): validator, math reporter, JSON parser, DB schema — `npx vitest run`

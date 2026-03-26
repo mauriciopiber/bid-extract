@@ -357,6 +357,46 @@ export default function ReviewPage() {
         </div>
       )}
 
+      {/* Document summary — totals */}
+      {fullData && (
+        <div className="px-8 py-4 bg-white border-b">
+          <div className="flex gap-8 items-start">
+            {/* Project info */}
+            {fullData.project && (
+              <div>
+                <div className="font-bold">{(fullData.project as Record<string, string>).name}</div>
+                {(fullData.project as Record<string, string>).owner && (
+                  <div className="text-xs text-gray-500">{(fullData.project as Record<string, string>).owner}</div>
+                )}
+                {(fullData.project as Record<string, string>).bidDate && (
+                  <div className="text-xs text-gray-500">{(fullData.project as Record<string, string>).bidDate}</div>
+                )}
+              </div>
+            )}
+
+            {/* Engineer estimate */}
+            {fullData.engineerEstimate && (
+              <div className="text-sm">
+                <div className="text-xs text-gray-400">Engineer Estimate</div>
+                <div className="font-bold text-blue-600">
+                  {formatMoney((fullData.engineerEstimate as { total: number }).total)}
+                </div>
+              </div>
+            )}
+
+            {/* Bidder totals */}
+            {Array.isArray(fullData.bidders) && (fullData.bidders as { rank: number; name: string; totalBaseBid?: number }[])
+              .filter(b => b.totalBaseBid != null)
+              .map((b, i) => (
+                <div key={i} className="text-sm">
+                  <div className="text-xs text-gray-400">#{b.rank} {b.name}</div>
+                  <div className="font-bold text-green-600">{formatMoney(b.totalBaseBid)}</div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Page-by-page review */}
       <div className="px-8 py-6">
         {pages.map((page) => (
