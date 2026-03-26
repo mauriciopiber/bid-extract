@@ -93,6 +93,12 @@ Flow:
 | `handwritten` | Scanned with handwritten values | Jackson Co / MegaKC |
 | `submission-list` | Just supplier names + dates | Jackson Co submissions page |
 
+### Domain Knowledge
+
+**Read `docs/bid-glossary.md` before working on extraction.** It defines the hierarchical structure of bid tabulations and the vocabulary. The LLM receives this glossary as context.
+
+Key hierarchy: Document → Contract(s) → Base Bid + Alternates → Section(s) → Item(s) → Sub-Items
+
 ### Output Schema
 
 Every PDF normalizes to `BidTabulation` (`src/schemas/bid-tabulation.ts`):
