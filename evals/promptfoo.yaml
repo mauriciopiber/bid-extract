@@ -1,0 +1,72 @@
+# Promptfoo evaluation config for bid extraction
+#
+# This tests our extraction prompts against known PDFs
+# and scores the output on math, completeness, and accuracy.
+#
+# Run: npx promptfoo eval -c evals/promptfoo.yaml
+
+description: "Bid Extract — Extraction Prompt Evaluation"
+
+providers:
+  - id: file://evals/provider.mjs
+    label: bid-extract-pipeline
+
+prompts:
+  - id: file://evals/prompts/extractor-v1.txt
+    label: extractor-v1
+
+tests:
+  - description: "Andrew Bridge 2350005 — simple-table, 1 bidder, 4 items"
+    vars:
+      pdf: "/tmp/bid-tabs/Bid_Results_Andrew_Bridge_2350005.pdf"
+    assert:
+      # Has bidders
+      - type: javascript
+        value: "output.bidders && output.bidders.length >= 1"
+      # Bidder has line items
+      - type: javascript
+        value: "output.bidders[0].lineItems && output.bidders[0].lineItems.length >= 4"
+      # Has project name
+      - type: javascript
+        value: "output.project && output.project.name && output.project.name.length > 0"
+      # Has total
+      - type: javascript
+        value: "output.bidders[0].totalBaseBid > 0"
+      # Math check — unit × qty = extended for LS items
+      - type: javascript
+        value: |
+          const lsItems = (output.bidders[0].lineItems || []).filter(i => i.unit === 'LS' && i.unitPrice && i.quantity);
+          lsItems.every(i => Math.abs(i.unitPrice * i.quantity - i.extendedPrice) < 0.01)
+      # Line items sum check
+      - type: javascript
+        value: |
+          const sum = (output.bidders[0].lineItems || []).reduce((s, i) => s + (i.extendedPrice || 0), 0);
+          const total = output.bidders[0].totalBaseBid;
+          !total || Math.abs(sum - total) < 1
+
+  - description: "Bollinger Co Road 416 — summary-only, 5 bidders, no items"
+    vars:
+      pdf: "/tmp/bid-tabs/Bid_Results_Bollinger_Co_Road_416_Bridge.pdf"
+    assert:
+      - type: javascript
+        value: "output.bidders && output.bidders.length >= 5"
+      - type: javascript
+        value: "output.project && output.project.name.length > 0"
+      - type: javascript
+        value: "output.bidders[0].totalBaseBid > 0"
+
+  - description: "Barry Co Farm Rd — engineering-firm, 4+ bidders, line items expected"
+    vars:
+      pdf: "/tmp/bid-tabs/Bid_Results_Barry_Co_Barry_County_Farm_Rd_2070.pdf"
+    assert:
+      - type: javascript
+        value: "output.bidders && output.bidders.length >= 4"
+      - type: javascript
+        value: "output.project && output.project.name.length > 0"
+      # THIS IS THE KEY TEST — we currently get 0 line items
+      - type: javascript
+        value: "output.bidders[0].lineItems && output.bidders[0].lineItems.length > 0"
+      - type: javascript
+        value: |
+          const allHaveItems = output.bidders.every(b => b.lineItems && b.lineItems.length > 0);
+          allHaveItems
