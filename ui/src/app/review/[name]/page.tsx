@@ -64,18 +64,18 @@ function PageCard({
         )}
       </div>
 
-      <div className="flex" style={{ minHeight: 500 }}>
+      <div className="flex" style={{ height: 700 }}>
         {/* Left: PDF page image */}
-        <div className="w-1/2 border-r border-gray-200 overflow-auto bg-gray-100 flex items-start justify-center p-2">
+        <div className="w-1/2 border-r border-gray-200 overflow-auto bg-gray-100">
           <iframe
             src={`/api/pdf/${pdfName}#page=${page.pageNumber}`}
-            className="w-full h-full min-h-[600px]"
+            className="w-full h-full"
             title={`Page ${page.pageNumber}`}
           />
         </div>
 
-        {/* Right: Extracted data for this page */}
-        <div className="w-1/2 overflow-auto p-4">
+        {/* Right: Extracted data — independent scroll */}
+        <div className="w-1/2 overflow-y-auto p-4">
           <PageDataView page={page} />
         </div>
       </div>
