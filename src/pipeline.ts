@@ -211,7 +211,7 @@ export async function runPipeline(
 
 // -- Merge --
 
-function mergePageResults(
+export function mergePageResults(
 	pageResults: PageExtractionResult[],
 	sourceFile: string,
 ): BidTabulation {
@@ -227,8 +227,9 @@ function mergePageResults(
 			Object.assign(projectInfo, d.project);
 		}
 
-		if (page.pageType === "cover" && d.project) {
-			Object.assign(projectInfo, d.project);
+		if (page.pageType === "cover") {
+			if (d.project) Object.assign(projectInfo, d.project);
+			if (d.engineer) projectInfo.engineer = d.engineer as string;
 		}
 
 		// Bid ranking → bidder identities
