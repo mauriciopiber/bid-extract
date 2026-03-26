@@ -6,9 +6,6 @@ export default defineConfig({
 	use: {
 		baseURL: "http://localhost:3001",
 	},
-	webServer: {
-		command: "npx next dev -p 3001",
-		port: 3001,
-		reuseExistingServer: true,
-	},
+	// Server must be running externally — we don't manage it here
+	// Start with: cd ui && npx next dev -p 3001
 });
