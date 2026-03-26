@@ -12,6 +12,24 @@ import {
 
 // -- Enums --
 
+export const documentStatusEnum = pgEnum("document_status", [
+	"queued",
+	"classifying",
+	"extracting",
+	"validating",
+	"reviewing",
+	"re_extracting",
+	"done",
+	"failed",
+]);
+
+export const clientStatusEnum = pgEnum("client_status", [
+	"pending",
+	"processing",
+	"reviewing",
+	"done",
+]);
+
 export const layoutStatusEnum = pgEnum("layout_status", [
 	"discovered",
 	"extracting",
@@ -56,6 +74,35 @@ export const pageTypes = pgTable("page_types", {
 	createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+
+/** A client / batch of documents to process */
+export const clients = pgTable("clients", {
+	id: serial().primaryKey(),
+	name: text().notNull(),
+	description: text(),
+	status: clientStatusEnum().notNull().default("pending"),
+	totalDocuments: integer("total_documents").notNull().default(0),
+	completedDocuments: integer("completed_documents").notNull().default(0),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+/** A single PDF document to process */
+export const documents = pgTable("documents", {
+	id: serial().primaryKey(),
+	clientId: integer("client_id").references(() => clients.id),
+	pdfFile: text("pdf_file").notNull(),
+	pdfPath: text("pdf_path").notNull(),
+	status: documentStatusEnum().notNull().default("queued"),
+	/** Current extraction attempt number */
+	attempt: integer().notNull().default(0),
+	/** Latest extraction ID */
+	extractionId: integer("extraction_id"),
+	/** Latest score */
+	score: real(),
+	createdAt: timestamp("created_at").notNull().defaultNow(),
+	updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
 
 /** A unique document layout / structure fingerprint */
 export const layouts = pgTable("layouts", {

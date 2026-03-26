@@ -96,6 +96,61 @@ program
 		});
 	});
 
+// -- Gear commands --
+
+program
+	.command("client:create")
+	.description("Create a client and queue all PDFs from a directory")
+	.argument("<name>", "Client name")
+	.argument("<pdf-dir>", "Directory containing PDFs")
+	.action(async (name, pdfDir) => {
+		const { createClient } = await import("./gear/client-gear.js");
+		await createClient(name, resolve(pdfDir));
+	});
+
+program
+	.command("client:run")
+	.description("Run the gear — process queued documents for a client")
+	.argument("<id>", "Client ID")
+	.option("-n, --limit <n>", "Max documents to process")
+	.action(async (id, options) => {
+		const { runClientGear } = await import("./gear/client-gear.js");
+		const limit = options.limit ? Number.parseInt(options.limit, 10) : undefined;
+		await runClientGear(Number.parseInt(id, 10), limit);
+	});
+
+program
+	.command("client:status")
+	.description("Show client progress")
+	.argument("<id>", "Client ID")
+	.action(async (id) => {
+		const { getClientProgress } = await import("./gear/client-gear.js");
+		const progress = await getClientProgress(Number.parseInt(id, 10));
+		console.log(`\nTotal:     ${progress.total}`);
+		console.log(`Done:      ${progress.done}`);
+		console.log(`Reviewing: ${progress.reviewing}`);
+		console.log(`Failed:    ${progress.failed}`);
+		console.log(`Queued:    ${progress.queued}`);
+	});
+
+program
+	.command("doc:process")
+	.description("Process a single document through the gear")
+	.argument("<id>", "Document ID")
+	.action(async (id) => {
+		const { processDocument } = await import("./gear/document-gear.js");
+		await processDocument(Number.parseInt(id, 10));
+	});
+
+program
+	.command("doc:reprocess")
+	.description("Re-process a document after contest resolution")
+	.argument("<id>", "Document ID")
+	.action(async (id) => {
+		const { reprocessDocument } = await import("./gear/document-gear.js");
+		await reprocessDocument(Number.parseInt(id, 10));
+	});
+
 // Always close DB after command finishes
 program.hook("postAction", async () => {
 	await closeDb();
