@@ -1,71 +1,70 @@
-# Kickoff Context
+# Kickoff — Read This First
 
-This project was bootstrapped from a conversation in the `dot-sync` repo. Here's the full backstory so you can hit the ground running.
+## What This Project Does
 
-## Origin
+Extracts structured data from bid tabulation PDFs (Missouri local governments). 99 PDFs, each a different format. Uses Claude vision API via Vercel AI SDK `generateObject` with Zod schemas.
 
-We have a zip file at `~/Downloads/2025.zip` containing **100 bid tabulation PDFs** from Missouri local governments. These are NOT state DOT lettings (which dot-sync handles) — these are local/municipal projects: bridges, sewer improvements, airports, sidewalks, water treatment, etc.
+## Current Status
 
-A client needs structured data extracted from all of them.
+**PR3 prompt is working:**
+- S02 (Andrew Bridge, 4 items, 1 bidder): **100%** — verified ✓
+- S04 (Eldon Storm Sewer, 29 items, 2 bidders): **98-99%** — needs human review
+- S01, S05: references generated but not tested with PR3
 
-## The Challenge
+**86 unit tests + 14 eval compare tests passing.**
 
-Every PDF uses a **completely different format**. We examined 6+ samples and found:
-
-| Format | Example File | What it looks like |
-|--------|-------------|-------------------|
-| **Simple table** | `Bid_Results_Andrew_Bridge_2350005.pdf` | 1 page, 1 bidder, 4 line items, clean table |
-| **Summary-only** | `Bid_Results_Kansas_City_TW_B_Reconstruction.pdf` | Just bidder names + total bids, no line items at all |
-| **Multi-bidder matrix** | `Bid_Results_Henry_Co_Bridge_BRO-R042_31_.pdf` | 6 bidders across columns, 30 line items, compliance checklist |
-| **Engineering firm template** | `Bid_Results_Cassville_7th_Street_Bridge_over_Flat_Creek.pdf` | Allgeier Martin template — item codes (201-99.01), roadway + bridge schedule sections, subtotals per section |
-| **Multi-section with alternates** | `Bid_Results_Hartsburg_Water_Treatment_Upgrades.pdf` | Base bid + 4 alternate sections, running cumulative totals, highlighted rows |
-| **Handwritten** | `Bid_Results_Jackson_Co_Little_Blue_Trace_Bundschu_Bridge_Replacement.pdf` | Scanned form with handwritten blue ink prices, cursive total amount at bottom |
-| **Submission list only** | Same Jackson Co file, page 1 | Just supplier names + submission dates, zero pricing data |
-| **Scanned with stamp** | `Bid_Results_Boonville_2025_Sanitary_Sewer_Improvements.pdf` | Engineer's professional seal/stamp overlapping data |
-
-## Architecture Decision
-
-A single extractor can't handle this diversity. We designed a **multi-agent pipeline**:
-
-```
-PDF → [Page Images] → Classifier Agent → Extractor Agent → Validator → JSON
-```
-
-- **Classifier** determines format type at runtime (unlike dot-sync which knows format from the provider)
-- **Extractor** uses format-specific prompts based on classification
-- **Validator** cross-checks math (unit × qty = extended, items sum to totals)
-- Everything is **vision-first** because text extraction fails on handwritten docs and complex layouts
-
-## What's Already Built
-
-- Universal output schema: `src/schemas/bid-tabulation.ts` (BidTabulation interface)
-- Agent stubs: classifier, extractor, validator (validator has working math checks)
-- CLI skeleton: `src/cli.ts`
-- PDF-to-images utility stub: `src/utils/pdf-to-images.ts`
-
-## What Needs To Be Built Next
-
-1. **PDF → images** — wire up `pdftoppm` (poppler) to render pages as PNG buffers
-2. **Classifier agent** — implement with Claude vision API. Send page 1, get back format type + metadata
-3. **Extractor agent** — start with `simple-table` format, then expand. Use classification to pick the right prompt
-4. **Test on real samples** — extract the zip to `/tmp/bid-tabs/`, pick the 6 diverse examples above, verify end-to-end
-5. **Run on all 100** — measure accuracy, iterate on prompts
-
-## Sample Data
+## Immediate Next Steps
 
 ```bash
-# Extract samples (if not already done)
-unzip -o ~/Downloads/2025.zip -d /tmp/bid-tabs/
+# 1. Verify S04 reference (human review)
+npx tsx evals/scripts/review.ts --sample=S04
+# → check values against PNG, fix if needed
+npx tsx evals/scripts/verify.ts --sample=S04 --by=mauricio
 
-# Good test set covering all format types:
-# /tmp/bid-tabs/Bid_Results_Andrew_Bridge_2350005.pdf                                    (simple)
-# /tmp/bid-tabs/Bid_Results_Kansas_City_TW_B_Reconstruction.pdf                          (summary-only)
-# /tmp/bid-tabs/Bid_Results_Henry_Co_Bridge_BRO-R042_31_.pdf                             (multi-bidder matrix)
-# /tmp/bid-tabs/Bid_Results_Cassville_7th_Street_Bridge_over_Flat_Creek.pdf               (engineering firm)
-# /tmp/bid-tabs/Bid_Results_Hartsburg_Water_Treatment_Upgrades.pdf                        (multi-section alternates)
-# /tmp/bid-tabs/Bid_Results_Jackson_Co_Little_Blue_Trace_Bundschu_Bridge_Replacement.pdf  (handwritten)
+# 2. Generate S05 reference (Barry Co — 5 bidders, matrix)
+npx tsx evals/scripts/generate-reference.ts --sample=S05
+
+# 3. Human review S05
+npx tsx evals/scripts/review.ts --sample=S05
+
+# 4. Run PR3 on all samples + regression check
+npx tsx evals/scripts/run.ts --sample=S02 --extractor=E1 --prompt=PR3 --runs=2
+npx tsx evals/scripts/run.ts --sample=S04 --extractor=E1 --prompt=PR3 --runs=2
+npx tsx evals/scripts/run.ts --sample=S05 --extractor=E1 --prompt=PR3 --runs=2
+
+# 5. Compare all
+npx tsx evals/scripts/compare.ts --sample=S02
+npx tsx evals/scripts/compare.ts --sample=S04
+npx tsx evals/scripts/compare.ts --sample=S05
+
+# 6. Math check
+npx tsx evals/scripts/check-math.ts
 ```
 
-## Tech Stack
+## Key Files
 
-TypeScript, pnpm, Vitest, Claude vision API (`@anthropic-ai/sdk`), `commander` for CLI.
+- `src/schemas/zod.ts` — THE Zod schemas (single source of truth)
+- `src/schemas/convert.ts` — flat ↔ hierarchical conversion
+- `evals/scripts/run.ts` — prompts PR1/PR2/PR3 defined here
+- `evals/reference/` — ground truth (verified by human)
+- `evals/results/` — extraction run outputs
+- `docs/sessions/` — all session learnings
+- `CLAUDE.md` — all rules and action words
+
+## Rules (read CLAUDE.md for full list)
+
+1. Never guess data — only extract what's visible
+2. Human approves all new concepts
+3. Math resolver REPORTS, never fixes
+4. One source of truth for types (Zod schemas)
+5. One output format (flat→hierarchical immediately)
+6. UI is the source of truth — if it's not in the UI, it doesn't exist
+7. No reference without human review
+8. Classify first, then extract
+9. Unit test everything
+
+## The Eval Loop
+
+```
+Generate reference → Human review → Verify → Run PR3 → Compare → Find failures → Fix prompt (PR4) → Re-run → Regression check → Repeat
+```
