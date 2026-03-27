@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
-import { z } from "zod";
+import { PageExtractionSchema } from "../../src/schemas/zod.js";
 
 const EVALS_DIR = join(import.meta.dirname, "..");
 const FILES_DIR =
@@ -50,62 +50,7 @@ const SAMPLES: Record<
 	},
 };
 
-// Schema matching BidTabulation exactly
-const BidValueSchema = z.object({
-	unitPrice: z.number().optional(),
-	extendedPrice: z.number().optional(),
-});
-
-const ItemSchema: z.ZodSchema = z.object({
-	itemNo: z.union([z.string(), z.number()]),
-	description: z.string(),
-	unit: z.string().optional(),
-	quantity: z.number().optional(),
-	subItems: z.array(z.lazy(() => ItemSchema)).optional(),
-	bids: z.record(z.string(), BidValueSchema),
-	engineerEstimate: BidValueSchema.optional(),
-});
-
-const SectionSchema = z.object({
-	name: z.string(),
-	items: z.array(ItemSchema),
-	subtotals: z.record(z.string(), z.number()).optional(),
-});
-
-const BidGroupSchema = z.object({
-	type: z.string(),
-	name: z.string(),
-	sections: z.array(SectionSchema),
-	totals: z.record(z.string(), z.number()).optional(),
-});
-
-const ContractSchema = z.object({
-	name: z.string(),
-	bidGroups: z.array(BidGroupSchema),
-});
-
-const BidderInfoSchema = z.object({
-	rank: z.number(),
-	name: z.string(),
-	address: z.string().optional(),
-	phone: z.string().optional(),
-	totalBaseBid: z.number().optional(),
-});
-
-const BidTabulationSchema = z.object({
-	project: z.object({
-		name: z.string(),
-		projectId: z.string().optional(),
-		owner: z.string().optional(),
-		bidDate: z.string().optional(),
-		location: z.string().optional(),
-	}),
-	contracts: z.array(ContractSchema),
-	bidders: z.array(BidderInfoSchema),
-	engineerEstimate: z
-		.object({ total: z.number() })
-		.optional(),
-});
+// Schema imported from src/schemas/zod.ts — single source of truth
 
 async function main() {
 	const args = process.argv.slice(2);
@@ -147,7 +92,7 @@ async function main() {
 	const { object } = await generateObject({
 		model: anthropic("claude-sonnet-4-20250514"),
 		maxTokens: 16384,
-		schema: BidTabulationSchema,
+		schema: PageExtractionSchema,
 		messages: [
 			{
 				role: "user",
@@ -193,20 +138,11 @@ Rules:
 	writeFileSync(refPath, JSON.stringify(reference, null, 2) + "\n");
 
 	// Print summary
-	console.log(`Project: ${object.project.name}`);
-	console.log(`Bidders: ${object.bidders.map((b) => `#${b.rank} ${b.name}`).join(", ")}`);
-	console.log(`Contracts: ${object.contracts.length}`);
-	for (const contract of object.contracts) {
-		console.log(`  ${contract.name}:`);
-		for (const group of contract.bidGroups) {
-			console.log(`    ${group.name} (${group.type}): ${group.sections.length} sections`);
-			for (const section of group.sections) {
-				console.log(`      ${section.name || "(no name)"}: ${section.items.length} items`);
-			}
-		}
-	}
+	console.log(`Bidders: ${object.bidders.map((b) => `#${b.rank} ${b.name} ($${b.totalBaseBid})`).join(", ")}`);
+	console.log(`Bid Group: ${object.bidGroupName} (${object.bidGroupType})`);
+	console.log(`Items: ${object.items.length}`);
 	if (object.engineerEstimate) {
-		console.log(`Engineer estimate: $${object.engineerEstimate.total}`);
+		console.log(`Engineer estimate total: $${object.engineerEstimate.total}`);
 	}
 
 	console.log(`\nSaved: evals/reference/${sample}.json`);

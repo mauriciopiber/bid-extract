@@ -1,0 +1,646 @@
+{
+  "layout": "bid_tabulation",
+  "sample": "S04",
+  "extractor": "E1",
+  "prompt": "PR3",
+  "run": 2,
+  "timestamp": "2026-03-27T16:58:34.242Z",
+  "durationMs": 53764,
+  "success": true,
+  "itemCount": 29,
+  "bidderCount": 2,
+  "data": {
+    "bidders": [
+      {
+        "rank": 1,
+        "name": "B&P Patterson Concrete & Construction",
+        "address": "PO Box 307, Linn MO 65051",
+        "totalBaseBid": 408382.1
+      },
+      {
+        "rank": 2,
+        "name": "Stockman Construction Co",
+        "address": "2021 Idlewood Road, Jefferson City MO 65109",
+        "totalBaseBid": 445563.8
+      }
+    ],
+    "items": [
+      {
+        "itemNo": "1",
+        "description": "Mobilization",
+        "unit": "LS",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 28000,
+            "extendedPrice": 28000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 23000,
+            "extendedPrice": 23000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 15000,
+          "extendedPrice": 15000
+        }
+      },
+      {
+        "itemNo": "2",
+        "description": "Traffic Control",
+        "unit": "LS",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 3000,
+            "extendedPrice": 3000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 12000,
+            "extendedPrice": 12000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 1000,
+          "extendedPrice": 1000
+        }
+      },
+      {
+        "itemNo": "3",
+        "description": "Remove Improvements",
+        "unit": "LS",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 15000,
+            "extendedPrice": 15000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 20000,
+            "extendedPrice": 20000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 15000,
+          "extendedPrice": 15000
+        }
+      },
+      {
+        "itemNo": "4",
+        "description": "Remove Improvements (Concrete)",
+        "unit": "LS",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 38000,
+            "extendedPrice": 38000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 12000,
+            "extendedPrice": 12000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 20000,
+          "extendedPrice": 20000
+        }
+      },
+      {
+        "itemNo": "5",
+        "description": "Remove Unsuitable Materials",
+        "unit": "CY",
+        "quantity": 10,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 75,
+            "extendedPrice": 750
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 40,
+            "extendedPrice": 400
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 30,
+          "extendedPrice": 300
+        }
+      },
+      {
+        "itemNo": "6",
+        "description": "Rock Backfill in Unsuitable Materials Areas",
+        "unit": "CY",
+        "quantity": 10,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 75,
+            "extendedPrice": 750
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 60,
+            "extendedPrice": 600
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 40,
+          "extendedPrice": 400
+        }
+      },
+      {
+        "itemNo": "7",
+        "description": "Subgrade Compaction (Sidewalk)",
+        "unit": "SY",
+        "quantity": 274,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 15,
+            "extendedPrice": 4110
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 4,
+            "extendedPrice": 1096
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 3,
+          "extendedPrice": 822
+        }
+      },
+      {
+        "itemNo": "8",
+        "description": "Subgrade Compaction (Driveways and Streets)",
+        "unit": "SY",
+        "quantity": 485,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 15,
+            "extendedPrice": 7275
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 4,
+            "extendedPrice": 1940
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 3,
+          "extendedPrice": 1455
+        }
+      },
+      {
+        "itemNo": "9",
+        "description": "Subgrade Compaction (Over and Gutter)",
+        "unit": "SY",
+        "quantity": 135,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 15,
+            "extendedPrice": 2025
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 44,
+            "extendedPrice": 5940
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 3,
+          "extendedPrice": 405
+        }
+      },
+      {
+        "itemNo": "10",
+        "description": "Geotextile Separation Fabric",
+        "unit": "SY",
+        "quantity": 343,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 9.5,
+            "extendedPrice": 3258.5
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 5,
+            "extendedPrice": 1715
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 4.5,
+          "extendedPrice": 1543.5
+        }
+      },
+      {
+        "itemNo": "11",
+        "description": "4\" Type 5 Aggregate Base",
+        "unit": "SY",
+        "quantity": 416,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 20,
+            "extendedPrice": 8320
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 9.79,
+            "extendedPrice": 4408.64
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 15,
+          "extendedPrice": 6240
+        }
+      },
+      {
+        "itemNo": "12",
+        "description": "6\" Type 5 Aggregate Base",
+        "unit": "SY",
+        "quantity": 343,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 24,
+            "extendedPrice": 8232
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 12,
+            "extendedPrice": 4116
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 25,
+          "extendedPrice": 8575
+        }
+      },
+      {
+        "itemNo": "13",
+        "description": "3\" PCC - Hot Bituminous Tack Base",
+        "unit": "SY",
+        "quantity": 343,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 37,
+            "extendedPrice": 12691
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 55,
+            "extendedPrice": 18865
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 42,
+          "extendedPrice": 14406
+        }
+      },
+      {
+        "itemNo": "14",
+        "description": "2\" BP-1 Surface Course",
+        "unit": "SY",
+        "quantity": 343,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 37,
+            "extendedPrice": 12691
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 45,
+            "extendedPrice": 15435
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 15,
+          "extendedPrice": 5145
+        }
+      },
+      {
+        "itemNo": "15",
+        "description": "Modify Curb Inlets",
+        "unit": "EA",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 2500,
+            "extendedPrice": 2500
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 4000,
+            "extendedPrice": 4000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 2000,
+          "extendedPrice": 2000
+        }
+      },
+      {
+        "itemNo": "16",
+        "description": "Modify Existing Concrete Box Culvert",
+        "unit": "EA",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 3000,
+            "extendedPrice": 3000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 5000,
+            "extendedPrice": 5000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 3000,
+          "extendedPrice": 3000
+        }
+      },
+      {
+        "itemNo": "17",
+        "description": "4\" PCC Concrete Sidewalk",
+        "unit": "SY",
+        "quantity": 225,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 75,
+            "extendedPrice": 16875
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 110,
+            "extendedPrice": 24750
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 60,
+          "extendedPrice": 13500
+        }
+      },
+      {
+        "itemNo": "18",
+        "description": "6\" Thk PCC Pavement",
+        "unit": "SY",
+        "quantity": 25,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 100,
+            "extendedPrice": 2500
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 206.76,
+            "extendedPrice": 5169
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 90,
+          "extendedPrice": 2250
+        }
+      },
+      {
+        "itemNo": "19",
+        "description": "8\" Thk PCC Pavement",
+        "unit": "SY",
+        "quantity": 117,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 125,
+            "extendedPrice": 14625
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 140,
+            "extendedPrice": 16380
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 125,
+          "extendedPrice": 14625
+        }
+      },
+      {
+        "itemNo": "20",
+        "description": "24\" Type A Curb and Gutter Including MoDot Type 5 Aggregate Base",
+        "unit": "LF",
+        "quantity": 593,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 65,
+            "extendedPrice": 38545
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 55,
+            "extendedPrice": 32615
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 60,
+          "extendedPrice": 35580
+        }
+      },
+      {
+        "itemNo": "21",
+        "description": "24\" Roll Back Curb and Gutter Including MoDot Type 5 Aggregate Base",
+        "unit": "LF",
+        "quantity": 13,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 100,
+            "extendedPrice": 1300
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 60,
+            "extendedPrice": 780
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 60,
+          "extendedPrice": 780
+        }
+      },
+      {
+        "itemNo": "22",
+        "description": "ADA Sidewalk Ramp",
+        "unit": "SY",
+        "quantity": 49,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 125,
+            "extendedPrice": 6125
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 133,
+            "extendedPrice": 6517
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 50,
+          "extendedPrice": 2450
+        }
+      },
+      {
+        "itemNo": "23",
+        "description": "ADA Truncated Dome",
+        "unit": "SF",
+        "quantity": 75,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 40,
+            "extendedPrice": 3000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 32,
+            "extendedPrice": 2400
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 40,
+          "extendedPrice": 3000
+        }
+      },
+      {
+        "itemNo": "24",
+        "description": "Pavement Marking",
+        "unit": "LF",
+        "quantity": 336,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 3.6,
+            "extendedPrice": 1209.6
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 4.8,
+            "extendedPrice": 1612.8
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 2,
+          "extendedPrice": 672
+        }
+      },
+      {
+        "itemNo": "25",
+        "description": "24\" HDPE Pipe in Place",
+        "unit": "LF",
+        "quantity": 1180,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 75,
+            "extendedPrice": 88500
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 110,
+            "extendedPrice": 129800
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 75,
+          "extendedPrice": 88500
+        }
+      },
+      {
+        "itemNo": "26",
+        "description": "Full Hoop Granular Fill",
+        "unit": "LF",
+        "quantity": 585,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 50,
+            "extendedPrice": 29250
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 65,
+            "extendedPrice": 38025
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 75,
+          "extendedPrice": 43875
+        }
+      },
+      {
+        "itemNo": "27",
+        "description": "Type \"C\" Curb Inlet (4'x8') Installed",
+        "unit": "EA",
+        "quantity": 3,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 8000,
+            "extendedPrice": 24000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 10000,
+            "extendedPrice": 30000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 7000,
+          "extendedPrice": 21000
+        }
+      },
+      {
+        "itemNo": "28",
+        "description": "Type \"C\" Curb Inlet (8'x8') Installed",
+        "unit": "EA",
+        "quantity": 2,
+        "isLumpSum": false,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 12000,
+            "extendedPrice": 24000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 11000,
+            "extendedPrice": 22000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 10000,
+          "extendedPrice": 20000
+        }
+      },
+      {
+        "itemNo": "29",
+        "description": "Fertilizing, Seeding and Mulching",
+        "unit": "LS",
+        "quantity": 1,
+        "isLumpSum": true,
+        "bids": {
+          "B&P Patterson Concrete & Construction": {
+            "unitPrice": 3000,
+            "extendedPrice": 3000
+          },
+          "Stockman Construction Co": {
+            "unitPrice": 4000,
+            "extendedPrice": 4000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 1000,
+          "extendedPrice": 1000
+        }
+      }
+    ],
+    "totals": {
+      "B&P Patterson Concrete & Construction": 408382.1,
+      "Stockman Construction Co": 445563.8
+    },
+    "engineerEstimate": {
+      "total": 342523.5
+    }
+  }
+}

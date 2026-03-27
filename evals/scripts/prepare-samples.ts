@@ -6,15 +6,16 @@
  *   npx tsx evals/scripts/prepare-samples.ts
  */
 
-import { mkdirSync, existsSync, readdirSync, renameSync } from "node:fs";
+import { mkdirSync, existsSync, readdirSync, renameSync, statSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 import { execFileSync } from "node:child_process";
 
 const EVALS_DIR = join(import.meta.dirname, "..");
 const SAMPLES_DIR = join(EVALS_DIR, "samples");
 const FILES_DIR = process.env.BID_FILES_DIR || "/Users/mauriciopiber/Projects/edge/bid-extract-files";
 const PDF_DIR = join(FILES_DIR, "pdfs");
-const DPI = 400;
+const DPI = 250;
 
 /** All samples — add new ones here */
 const SAMPLES: Record<
@@ -48,7 +49,7 @@ const SAMPLES: Record<
 	},
 };
 
-function main() {
+async function main() {
 	mkdirSync(SAMPLES_DIR, { recursive: true });
 
 	console.log(`Preparing samples at ${DPI} DPI\n`);
@@ -85,7 +86,18 @@ function main() {
 				renameSync(join(SAMPLES_DIR, files[0]), outPath);
 			}
 
-			console.log(`  ${id}: ${sample.description}`);
+			// Compress if over 3.5MB (base64 adds 33%, need to stay under 5MB API limit)
+			const size = statSync(outPath).size;
+			if (size > 3_500_000) {
+				await sharp(outPath)
+					.png({ compressionLevel: 9, palette: true })
+					.toFile(outPath + ".compressed");
+				renameSync(outPath + ".compressed", outPath);
+				const newSize = statSync(outPath).size;
+				console.log(`  ${id}: ${sample.description} (compressed ${(size / 1e6).toFixed(1)}MB → ${(newSize / 1e6).toFixed(1)}MB)`);
+			} else {
+				console.log(`  ${id}: ${sample.description} (${(size / 1e6).toFixed(1)}MB)`);
+			}
 		} catch (err) {
 			console.error(
 				`  ${id}: FAILED — ${err instanceof Error ? err.message : err}`,
