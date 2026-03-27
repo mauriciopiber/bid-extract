@@ -2,62 +2,106 @@
   "verified": false,
   "verifiedBy": null,
   "verifiedAt": null,
-  "layout": "bid_tabulation",
   "sample": "S02",
   "pdfFile": "Bid_Results_Andrew_Bridge_2350005.pdf",
   "pageNumber": 1,
-  "pageType": "bid_tabulation",
-  "bidders": [
-    "C&C BRIDGE & CONCRETE, INC"
-  ],
-  "engineerEstimateTotal": 150000,
-  "items": [
+  "project": {
+    "name": "Andrew County Bridge NO. 2350005",
+    "projectId": "2350005",
+    "owner": "Andrew County",
+    "bidDate": "Monday, May 5, 2025"
+  },
+  "contracts": [
     {
-      "itemNo": "1",
-      "sectionName": "Bridge Items",
-      "description": "MOBILIZATION",
-      "unit": "LS",
-      "quantity": 1,
-      "bids": {
-        "C&C BRIDGE & CONCRETE, INC": {"unitPrice": 50000, "extendedPrice": 50000}
-      },
-      "engineerEstimate": {"unitPrice": 40000, "extendedPrice": 40000}
-    },
-    {
-      "itemNo": "2",
-      "sectionName": "Bridge Items",
-      "description": "DRIVING H-PILE",
-      "unit": "FT",
-      "quantity": 700,
-      "bids": {
-        "C&C BRIDGE & CONCRETE, INC": {"unitPrice": 30000, "extendedPrice": 30000}
-      },
-      "engineerEstimate": {"unitPrice": 30000, "extendedPrice": 30000}
-    },
-    {
-      "itemNo": "3",
-      "sectionName": "Bridge Items",
-      "description": "DRIVING SHEET PILE",
-      "unit": "SF",
-      "quantity": 2520,
-      "bids": {
-        "C&C BRIDGE & CONCRETE, INC": {"unitPrice": 40000, "extendedPrice": 40000}
-      },
-      "engineerEstimate": {"unitPrice": 40000, "extendedPrice": 40000}
-    },
-    {
-      "itemNo": "4",
-      "sectionName": "Bridge Items",
-      "description": "CONSTRUCT CAPS & SET BEAMS",
-      "unit": "LS",
-      "quantity": 1,
-      "bids": {
-        "C&C BRIDGE & CONCRETE, INC": {"unitPrice": 42000, "extendedPrice": 42000}
-      },
-      "engineerEstimate": {"unitPrice": 40000, "extendedPrice": 40000}
+      "name": "Base Bid",
+      "bidGroups": [
+        {
+          "type": "Base Bid",
+          "name": "Base Bid",
+          "sections": [
+            {
+              "name": "Bridge Items",
+              "items": [
+                {
+                  "itemNo": "1",
+                  "description": "MOBILIZATION",
+                  "bids": {
+                    "C&C BRIDGE & CONCRETE, INC": {
+                      "unitPrice": 50000,
+                      "extendedPrice": 50000
+                    }
+                  },
+                  "engineerEstimate": {
+                    "unitPrice": 40000,
+                    "extendedPrice": 40000
+                  }
+                },
+                {
+                  "itemNo": "2",
+                  "description": "DRIVING H-PILE",
+                  "unit": "FT",
+                  "quantity": 700,
+                  "bids": {
+                    "C&C BRIDGE & CONCRETE, INC": {
+                      "unitPrice": 30000,
+                      "extendedPrice": 30000
+                    }
+                  },
+                  "engineerEstimate": {
+                    "unitPrice": 30000,
+                    "extendedPrice": 30000
+                  }
+                },
+                {
+                  "itemNo": "3",
+                  "description": "DRIVING SHEET PILE",
+                  "unit": "SF",
+                  "quantity": 2520,
+                  "bids": {
+                    "C&C BRIDGE & CONCRETE, INC": {
+                      "unitPrice": 40000,
+                      "extendedPrice": 40000
+                    }
+                  },
+                  "engineerEstimate": {
+                    "unitPrice": 40000,
+                    "extendedPrice": 40000
+                  }
+                },
+                {
+                  "itemNo": "4",
+                  "description": "CONSTRUCT CAPS & SET BEAMS",
+                  "bids": {
+                    "C&C BRIDGE & CONCRETE, INC": {
+                      "unitPrice": 42000,
+                      "extendedPrice": 42000
+                    }
+                  },
+                  "engineerEstimate": {
+                    "unitPrice": 40000,
+                    "extendedPrice": 40000
+                  }
+                }
+              ]
+            }
+          ],
+          "totals": {
+            "C&C BRIDGE & CONCRETE, INC": 162000
+          }
+        }
+      ]
     }
   ],
-  "totals": {
-    "C&C BRIDGE & CONCRETE, INC": 162000
+  "bidders": [
+    {
+      "rank": 1,
+      "name": "C&C BRIDGE & CONCRETE, INC",
+      "address": "CHRIS CHILDRENS",
+      "phone": "660-834-3109",
+      "totalBaseBid": 162000
+    }
+  ],
+  "engineerEstimate": {
+    "total": 150000
   }
 }
