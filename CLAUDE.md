@@ -127,6 +127,7 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 - **NO INLINE SCHEMAS.** If a Zod schema is needed for `generateObject` or validation, it lives in `src/schemas/` and is imported. Never defined inside a script file.
 - **NO DUPLICATED CODE.** If the same logic exists in two places, extract it. If a type exists in two places, delete one and import. Before writing ANY new type or interface, check if it already exists.
 - **UNIT TEST EVERYTHING.** Every function must have unit tests before it's used. Write the test first, verify it fails, then implement, then verify it passes.
+- **ONE OUTPUT FORMAT.** The hierarchical BidTabulation schema is THE format. If the LLM produces flat output (because flat Zod schemas work better with generateObject), convert it to hierarchical IMMEDIATELY after extraction using a single `toHierarchical()` function. Every downstream system (evals, pipeline, UI, compare) consumes the hierarchical format. NEVER pass flat data around. NEVER have two formats in flight.
 
 ## Action Words
 
