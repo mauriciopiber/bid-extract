@@ -11,9 +11,8 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { generateObject } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
-import { z } from "zod";
+import { PageExtractionSchema } from "../../src/schemas/zod.js";
 import { pdfToImages } from "../../src/utils/pdf-to-images.js";
-import type { RunResult } from "../lib/types.js";
 
 const EVALS_DIR = join(import.meta.dirname, "..");
 
@@ -62,34 +61,38 @@ Rules:
 - Set sectionName from any visible section headers
 - Include supplemental items and alternates if visible on this page`,
 	},
+	PR2: {
+		id: "PR2",
+		text: `Extract ALL bid tabulation data from this page.
+
+This is a bid tabulation document. It shows line items with quantities and prices from multiple bidders.
+
+IMPORTANT — Engineer's Estimate:
+- The "Engineer's Estimate" or "Engineer's Opinion of Cost" column is NOT a bidder
+- Do NOT include it in the bidders array
+- Instead, extract it into the engineerEstimate field on each item
+- The engineer's estimate also has a total — include it in the top-level engineerEstimate
+
+IMPORTANT — Totals:
+- Extract the total bid amount for each bidder (usually in a "Total Bid" row)
+- Include bidder totals in the bidders array as totalBaseBid
+
+IMPORTANT — Lump Sum:
+- When unitPrice equals extendedPrice regardless of quantity, set isLumpSum: true
+- This is common — the bidder gives a flat price for the entire item
+
+Rules:
+- Identify ALL bidder names from column headers (NOT the engineer's estimate)
+- Extract EVERY numbered line item row — do NOT stop early
+- For each bid, use object format: {"unitPrice": N, "extendedPrice": N}
+- Only set unitPrice if explicitly shown as a separate column value
+- All monetary values as numbers (no $ signs, no commas)
+- Set sectionName from any visible section headers
+- Include supplemental items and alternates if visible on this page`,
+	},
 };
 
-// -- Schema --
-
-const BidValueSchema = z.object({
-	unitPrice: z.number().optional(),
-	extendedPrice: z.number().optional(),
-});
-
-const ExtractionSchema = z.object({
-	bidders: z.array(z.string()),
-	bidGroupType: z.string(),
-	bidGroupName: z.string(),
-	items: z.array(
-		z.object({
-			itemNo: z.string(),
-			description: z.string(),
-			sectionName: z.string().optional(),
-			unit: z.string().optional(),
-			quantity: z.number().optional(),
-			bids: z.record(z.string(), BidValueSchema),
-			engineerEstimate: BidValueSchema.optional(),
-		}),
-	),
-	totals: z.record(z.string(), z.number()).optional(),
-	continuedFromPrevious: z.boolean(),
-	continuedOnNext: z.boolean(),
-});
+// Schema imported from src/schemas/zod.ts — single source of truth
 
 // -- Runner --
 
@@ -127,7 +130,7 @@ async function runExtraction(
 		const { object } = await generateObject({
 			model: anthropic(extractorConfig.model),
 			maxTokens: 16384,
-			schema: ExtractionSchema,
+			schema: PageExtractionSchema,
 			messages: [
 				{
 					role: "user",

@@ -95,18 +95,20 @@ async function main() {
 
 	for (const result of results) {
 		// Convert flat run result to BidTabRef shape for comparison
+		// biome-ignore lint: dynamic eval data
+		const bidders = (result.data.bidders || []).map((b: any, i: number) =>
+			typeof b === "string" ? { rank: i + 1, name: b } : b,
+		);
 		const resultAsBidTab = {
-			bidders: (result.data.bidders || []).map((name: string, i: number) => ({
-				rank: i + 1,
-				name,
-			})),
+			bidders,
+			engineerEstimate: result.data.engineerEstimate,
 			contracts: result.data.items
 				? [
 						{
 							name: "Base Bid",
 							bidGroups: [
 								{
-									type: "base",
+									type: "base" as const,
 									name: "Base Bid",
 									sections: [
 										{

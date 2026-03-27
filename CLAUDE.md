@@ -119,6 +119,13 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 
 11. **NO REFERENCE WITHOUT HUMAN REVIEW.** Ground truth is ONLY valid after a human has verified every value against the PDF. A reference file created by code or LLM is a DRAFT — it cannot be used for scoring until marked as `"verified": true` by a human. Eval scores against unverified references are meaningless.
 
+## Development Rules
+
+- **ONE SOURCE OF TRUTH FOR TYPES.** Zod schemas live in `src/schemas/`. TypeScript types are inferred from Zod with `z.infer<>`. NEVER duplicate type definitions. NEVER define types or schemas in scripts, evals, UI, or anywhere else. Always import from `src/schemas/`.
+- **NO INLINE SCHEMAS.** If a Zod schema is needed for `generateObject` or validation, it lives in `src/schemas/` and is imported. Never defined inside a script file.
+- **NO DUPLICATED CODE.** If the same logic exists in two places, extract it. If a type exists in two places, delete one and import. Before writing ANY new type or interface, check if it already exists.
+- **UNIT TEST EVERYTHING.** Every function must have unit tests before it's used. Write the test first, verify it fails, then implement, then verify it passes.
+
 ## Action Words
 
 When the user says these words, do exactly this:
