@@ -1,0 +1,108 @@
+{
+  "layout": "bid_tabulation",
+  "sample": "S02",
+  "extractor": "E1",
+  "prompt": "PR1",
+  "run": 2,
+  "timestamp": "2026-03-27T00:42:08.060Z",
+  "durationMs": 11039,
+  "success": true,
+  "itemCount": 4,
+  "bidderCount": 2,
+  "data": {
+    "bidders": [
+      "Engineer's Opinion",
+      "C&C BRIDGE & CONCRETE, INC"
+    ],
+    "items": [
+      {
+        "itemNo": "1",
+        "description": "MOBILIZATION",
+        "sectionName": "Bridge Items",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "Engineer's Opinion": {
+            "unitPrice": 40000,
+            "extendedPrice": 40000
+          },
+          "C&C BRIDGE & CONCRETE, INC": {
+            "unitPrice": 50000,
+            "extendedPrice": 50000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 40000,
+          "extendedPrice": 40000
+        }
+      },
+      {
+        "itemNo": "2",
+        "description": "DRIVING H-PILE",
+        "sectionName": "Bridge Items",
+        "unit": "FT",
+        "quantity": 700,
+        "bids": {
+          "Engineer's Opinion": {
+            "unitPrice": 30000,
+            "extendedPrice": 30000
+          },
+          "C&C BRIDGE & CONCRETE, INC": {
+            "unitPrice": 30000,
+            "extendedPrice": 30000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 30000,
+          "extendedPrice": 30000
+        }
+      },
+      {
+        "itemNo": "3",
+        "description": "DRIVING SHEET PILE",
+        "sectionName": "Bridge Items",
+        "unit": "SF",
+        "quantity": 2520,
+        "bids": {
+          "Engineer's Opinion": {
+            "unitPrice": 40000,
+            "extendedPrice": 40000
+          },
+          "C&C BRIDGE & CONCRETE, INC": {
+            "unitPrice": 40000,
+            "extendedPrice": 40000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 40000,
+          "extendedPrice": 40000
+        }
+      },
+      {
+        "itemNo": "4",
+        "description": "CONSTRUCT CAPS & SET BEAMS",
+        "sectionName": "Bridge Items",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "Engineer's Opinion": {
+            "unitPrice": 40000,
+            "extendedPrice": 40000
+          },
+          "C&C BRIDGE & CONCRETE, INC": {
+            "unitPrice": 42000,
+            "extendedPrice": 42000
+          }
+        },
+        "engineerEstimate": {
+          "unitPrice": 40000,
+          "extendedPrice": 40000
+        }
+      }
+    ],
+    "totals": {
+      "Engineer's Opinion": 150000,
+      "C&C BRIDGE & CONCRETE, INC": 162000
+    }
+  }
+}

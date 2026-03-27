@@ -24,6 +24,22 @@ const SAMPLES: Record<string, { pdfFile: string; pageNumber: number }> = {
 		pdfFile: "Bid_Results_Anderson_Waster_System_Improvements.pdf",
 		pageNumber: 1,
 	},
+	S02: {
+		pdfFile: "Bid_Results_Andrew_Bridge_2350005.pdf",
+		pageNumber: 1,
+	},
+	S03: {
+		pdfFile: "Bid_Results_Bollinger_Co_Road_416_Bridge.pdf",
+		pageNumber: 1,
+	},
+	S04: {
+		pdfFile: "Bid_Results_Eldon_First_Street_Storm_Sewer_Improvements_2025.pdf",
+		pageNumber: 1,
+	},
+	S05: {
+		pdfFile: "Bid_Results_Barry_Co_Barry_County_Farm_Rd_2070.pdf",
+		pageNumber: 1,
+	},
 };
 
 const EXTRACTORS: Record<string, { model: string; description: string }> = {
@@ -91,9 +107,18 @@ async function runExtraction(
 	if (!extractorConfig) throw new Error(`Unknown extractor: ${extractor}`);
 	if (!promptConfig) throw new Error(`Unknown prompt: ${prompt}`);
 
-	const pdfPath = join("/tmp/bid-tabs", sampleConfig.pdfFile);
-	const pages = await pdfToImages(pdfPath);
-	const pageImage = pages[sampleConfig.pageNumber - 1].image;
+	// Use pre-rendered sample image (600 DPI) if available, else render on the fly
+	const sampleImagePath = join(EVALS_DIR, "samples", `${sample}.png`);
+	let pageImage: Buffer;
+	try {
+		const { readFileSync } = await import("node:fs");
+		pageImage = readFileSync(sampleImagePath);
+	} catch {
+		const FILES_DIR = process.env.BID_FILES_DIR || "/Users/mauriciopiber/Projects/edge/bid-extract-files";
+		const pdfPath = join(FILES_DIR, "pdfs", sampleConfig.pdfFile);
+		const pages = await pdfToImages(pdfPath);
+		pageImage = pages[sampleConfig.pageNumber - 1].image;
+	}
 
 	console.log(`  Running ${extractor}/${prompt} on ${sample} (run ${runNumber})...`);
 	const startTime = Date.now();

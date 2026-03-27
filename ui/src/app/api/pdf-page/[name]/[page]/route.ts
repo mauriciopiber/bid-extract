@@ -6,7 +6,8 @@ import { join } from "node:path";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
-const PDF_DIR = "/tmp/bid-tabs";
+const FILES_DIR = process.env.BID_FILES_DIR || "/Users/mauriciopiber/Projects/edge/bid-extract-files";
+const PDF_DIR = `${FILES_DIR}/pdfs`;
 
 export async function GET(
   _req: Request,
