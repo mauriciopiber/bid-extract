@@ -62,27 +62,33 @@ export const ProjectInfoSchema = z.object({
 	engineer: z.string().optional(),
 });
 
-/** Schema for generateObject — what the LLM fills */
+/** Schema for generateObject — what the LLM fills.
+ *  Flat format that maps 1:1 to the hierarchical BidTabulation.
+ *  toHierarchical() converts without losing or computing any data. */
 export const PageExtractionSchema = z.object({
-	bidders: z.array(BidderInfoSchema),
-	bidGroupType: z.string(),
-	bidGroupName: z.string(),
+	project: ProjectInfoSchema.optional().describe("Project info if visible on this page"),
+	bidders: z.array(BidderInfoSchema).describe("ALL bidders — NOT the engineer's estimate"),
+	bidGroupType: z.string().describe("base, supplemental, or alternate"),
+	bidGroupName: z.string().describe("Name as shown: Base Bid, Alternate 1, etc."),
 	items: z.array(
 		z.object({
 			itemNo: z.string(),
 			description: z.string(),
-			sectionName: z.string().optional(),
+			sectionName: z.string().optional().describe("Section header this item belongs to: Bridge Items, Roadway Items, etc."),
 			unit: z.string().optional(),
 			quantity: z.number().optional(),
-			isLumpSum: z.boolean().optional(),
-			bids: z.record(z.string(), BidValueSchema),
+			isLumpSum: z.boolean().optional().describe("True when unitPrice = extendedPrice regardless of quantity"),
+			bids: z.record(z.string(), BidValueSchema).describe("Bids keyed by exact bidder name"),
 			engineerEstimate: BidValueSchema.optional(),
 		}),
 	),
-	totals: z.record(z.string(), z.number()).optional().describe("Total bid amount per bidder from the Total row"),
+	sectionSubtotals: z.record(z.string(), z.record(z.string(), z.number())).optional()
+		.describe("Subtotals per section per bidder: {sectionName: {bidderName: amount}}"),
+	totals: z.record(z.string(), z.number()).optional()
+		.describe("Total bid amount per bidder from the Total row"),
 	engineerEstimate: z.object({
 		total: z.number().describe("The engineer's estimate total from the Total row"),
-	}).optional().describe("Engineer's estimate total — read from the Total Bid row of the engineer's estimate column"),
+	}).optional().describe("Engineer's estimate total from the Total row"),
 	continuedFromPrevious: z.boolean(),
 	continuedOnNext: z.boolean(),
 });
