@@ -56,38 +56,40 @@ function main() {
 		process.exit(1);
 	}
 
-	// Show reference summary
+	// Show reference summary using BidTabulation schema
 	const ref = JSON.parse(readFileSync(refPath, "utf-8"));
 	console.log(`\n=== Review: ${sample} ===`);
 	console.log(`PDF: ${ref.pdfFile} page ${ref.pageNumber}`);
 	console.log(`Status: ${ref.verified ? "✓ VERIFIED" : "⚠ UNVERIFIED"}`);
-	console.log(`Bidders: ${ref.bidders.join(", ")}`);
-	console.log(`Items: ${ref.items.length}`);
+	console.log(`Project: ${ref.project?.name}`);
+	console.log(`Bidders: ${(ref.bidders || []).map((b: any) => `#${b.rank} ${b.name} ($${b.totalBaseBid})`).join(", ")}`);
+	if (ref.engineerEstimate) console.log(`Engineer Estimate: $${ref.engineerEstimate.total}`);
 	console.log();
 
-	for (const item of ref.items) {
-		const bids = Object.entries(item.bids)
-			.map(([name, bid]: [string, any]) => {
-				const parts = [];
-				if (bid.unitPrice != null) parts.push(`unit=$${bid.unitPrice}`);
-				if (bid.extendedPrice != null) parts.push(`ext=$${bid.extendedPrice}`);
-				return `${name.slice(0, 20)}: ${parts.join(", ")}`;
-			})
-			.join(" | ");
-
-		console.log(`  ${String(item.itemNo).padEnd(4)} ${item.description.slice(0, 45).padEnd(47)} ${(item.unit || "").padEnd(4)} ${String(item.quantity ?? "").padEnd(8)} ${bids}`);
-
-		if (item.engineerEstimate) {
-			const eng = item.engineerEstimate;
-			const parts = [];
-			if (eng.unitPrice != null) parts.push(`unit=$${eng.unitPrice}`);
-			if (eng.extendedPrice != null) parts.push(`ext=$${eng.extendedPrice}`);
-			console.log(`       ENG EST: ${parts.join(", ")}`);
+	for (const contract of ref.contracts || []) {
+		console.log(`CONTRACT: ${contract.name}`);
+		for (const group of contract.bidGroups || []) {
+			console.log(`  GROUP: ${group.name} (${group.type})`);
+			for (const section of group.sections || []) {
+				console.log(`    SECTION: ${section.name || "(none)"}`);
+				for (const item of section.items || []) {
+					const bids = Object.entries(item.bids || {})
+						.map(([name, bid]: [string, any]) => {
+							const parts = [];
+							if (bid.unitPrice != null) parts.push(`u=$${bid.unitPrice}`);
+							if (bid.extendedPrice != null) parts.push(`e=$${bid.extendedPrice}`);
+							return `${name.slice(0, 15)}: ${parts.join(",")}`;
+						})
+						.join(" | ");
+					const eng = item.engineerEstimate
+						? ` ENG: u=$${item.engineerEstimate.unitPrice ?? "?"} e=$${item.engineerEstimate.extendedPrice ?? "?"}`
+						: "";
+					console.log(`      ${String(item.itemNo).padEnd(4)} ${(item.description || "").slice(0, 40).padEnd(42)} ${(item.unit || "").padEnd(4)} ${String(item.quantity ?? "").padEnd(6)} ${bids}${eng}`);
+				}
+				if (section.subtotals) console.log(`      SUBTOTALS: ${JSON.stringify(section.subtotals)}`);
+			}
+			if (group.totals) console.log(`  TOTALS: ${JSON.stringify(group.totals)}`);
 		}
-	}
-
-	if (ref.totals) {
-		console.log(`\n  Totals: ${JSON.stringify(ref.totals)}`);
 	}
 
 	console.log(`\nOpening image + JSON for review...`);

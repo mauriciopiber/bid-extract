@@ -49,6 +49,8 @@ export interface Item {
 	description: string;
 	unit?: string;
 	quantity?: number;
+	/** True when unit is LS or when unitPrice = extendedPrice regardless of quantity */
+	isLumpSum?: boolean;
 	subItems?: Item[];
 	bids: Record<string, BidValue>;
 	engineerEstimate?: BidValue;
@@ -57,6 +59,8 @@ export interface Item {
 export interface BidValue {
 	unitPrice?: number;
 	extendedPrice?: number;
+	/** True if bidder did not bid on this item (alternate they skipped) */
+	noBid?: boolean;
 }
 
 export interface BidderInfo {

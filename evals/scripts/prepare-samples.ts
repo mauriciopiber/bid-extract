@@ -14,7 +14,7 @@ const EVALS_DIR = join(import.meta.dirname, "..");
 const SAMPLES_DIR = join(EVALS_DIR, "samples");
 const FILES_DIR = process.env.BID_FILES_DIR || "/Users/mauriciopiber/Projects/edge/bid-extract-files";
 const PDF_DIR = join(FILES_DIR, "pdfs");
-const DPI = 600;
+const DPI = 400;
 
 /** All samples — add new ones here */
 const SAMPLES: Record<
