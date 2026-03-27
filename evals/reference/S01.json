@@ -1,0 +1,51 @@
+{
+  "layout": "bid_tabulation",
+  "sample": "S01",
+  "pdfFile": "Bid_Results_Anderson_Waster_System_Improvements.pdf",
+  "pageNumber": 1,
+  "pageType": "bid_tabulation",
+  "bidders": [
+    "A & B Equipment, LLC",
+    "Goins Enterprises, Inc.",
+    "Martin General Contractors"
+  ],
+  "items": [
+    {
+      "itemNo": "1",
+      "sectionName": "SECTION NO. 1 - FIRST NOTICE TO PROCEED",
+      "description": "Mobilization, bonds and insurance",
+      "unit": "LS",
+      "quantity": 1,
+      "bids": {
+        "A & B Equipment, LLC": {"extendedPrice": 50000},
+        "Goins Enterprises, Inc.": {"extendedPrice": 50000},
+        "Martin General Contractors": {"extendedPrice": 30730}
+      }
+    },
+    {
+      "itemNo": "2",
+      "sectionName": "SECTION NO. 1 - FIRST NOTICE TO PROCEED",
+      "description": "Temporary erosion and sediment control",
+      "unit": "LS",
+      "quantity": 1,
+      "bids": {
+        "A & B Equipment, LLC": {"extendedPrice": 5000},
+        "Goins Enterprises, Inc.": {"extendedPrice": 35000},
+        "Martin General Contractors": {"extendedPrice": 50000}
+      }
+    },
+    {
+      "itemNo": "3",
+      "sectionName": "SECTION NO. 1 - FIRST NOTICE TO PROCEED",
+      "description": "Drilling 8\" pilot hole below surface casing point",
+      "unit": "LF",
+      "quantity": 1725,
+      "bids": {
+        "A & B Equipment, LLC": {"unitPrice": 68, "extendedPrice": 117300},
+        "Goins Enterprises, Inc.": {"unitPrice": 78, "extendedPrice": 134550},
+        "Martin General Contractors": {"unitPrice": 150, "extendedPrice": 258750}
+      }
+    }
+  ],
+  "_note": "PARTIAL REFERENCE — only first 3 items verified manually. Need to verify remaining items 4-19 + supplemental + alternate from the PDF. This file will be expanded as items are verified."
+}

@@ -1,0 +1,380 @@
+{
+  "layout": "bid_tabulation",
+  "sample": "S01",
+  "extractor": "E1",
+  "prompt": "PR1",
+  "run": 1,
+  "timestamp": "2026-03-27T00:08:16.390Z",
+  "durationMs": 66798,
+  "success": true,
+  "itemCount": 20,
+  "bidderCount": 3,
+  "data": {
+    "bidders": [
+      "A & B Equipment, LLC",
+      "Gene's Enterprises, Inc",
+      "Martin General Contractors"
+    ],
+    "items": [
+      {
+        "itemNo": "1",
+        "description": "Mobilization, bonds and insurance",
+        "sectionName": "SECTION NO. 1 - FIRST NOTICED PROCEED:",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 10000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 15000
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 997200
+          }
+        }
+      },
+      {
+        "itemNo": "2",
+        "description": "Drilling 8\" pilot hole below surface casing point to estimated basalt depth, including all fill points, drilling to MD-Chg-4, and casing grouting to QSD-ChB for chemical analysis testing and approved",
+        "sectionName": "SECTION NO. 1 - FIRST NOTICED PROCEED:",
+        "unit": "LF",
+        "quantity": 1725,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 63300
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 36300
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 183750
+          }
+        }
+      },
+      {
+        "itemNo": "4",
+        "description": "Excavating for 15' settling pond with 1:3 side slope",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "LF",
+        "quantity": 415,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 32930
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 37310
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 85380
+          }
+        }
+      },
+      {
+        "itemNo": "5",
+        "description": "Construct gabion baskets for new 15' settling pond",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "SF",
+        "quantity": 512,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 18560
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 18078
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 36096
+          }
+        }
+      },
+      {
+        "itemNo": "6",
+        "description": "Furnish and install new 8\" potable well unit",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 19500
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 11500
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 15000
+          }
+        }
+      },
+      {
+        "itemNo": "7",
+        "description": "Install IP-MP manual bypass and manual hydrant valves in this item!",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "LF",
+        "quantity": 512,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 10752
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 11526
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 15360
+          }
+        }
+      },
+      {
+        "itemNo": "8",
+        "description": "Connect to MD-CHG-4, well disinfection, 24 hour pump test, initial test pump No. 1, remove installation",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 33640
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 37197
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 39500
+          }
+        }
+      },
+      {
+        "itemNo": "10",
+        "description": "for an estimated setting of 600 feet (including a 4\" diameter column pipe via the DRI piping on) joint and miscellaneous work as required by the plans and specifications for a complete, tested, operating system",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 64500
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 74175
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 89250
+          }
+        }
+      },
+      {
+        "itemNo": "11",
+        "description": "Pump head end of electrical work at the new well and pump house except for the Emergency Generator. To install, connect and, start motor starter, lightning arrestor, surge capacitor, phone monitor, HDA Controls, conduit, grounding wire, submersible power cable, and miscellaneous work required by the Contract Documents for a complete well pump and pump house facility",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 9000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 46200
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 108800
+          }
+        }
+      },
+      {
+        "itemNo": "12",
+        "description": "Furnish and install one (1) pump controller at the pump house, including pipe, fittings, electrical, and mechanical components for a complete, tested, operating system per Contract Documents",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 7000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 20000
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 30000
+          }
+        }
+      },
+      {
+        "itemNo": "13",
+        "description": "All pump house main line piping and control plumbing including fittings, flow meter, valves, pressure, chlorine equipment, check recorder, telluiy materials tested, primed, painted, and miscellaneous equipment required by the Contract Documents for a complete facility",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 65100
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 49128
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 52360
+          }
+        }
+      },
+      {
+        "itemNo": "14",
+        "description": "Furnish materials and erect wooden frame roof siding pump house building complete including foundation, conduit in slab, 4\" discharge pipe for future tower unit in distribution system, lighting, electric service, concrete floor, and all miscellaneous building electrical, weatherproof, wiring conduit, ground and meter base, roof appurtenances, all miscellaneous doors, windows, finish work, painting, for a complete appurtenant facility",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 105500
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 133319
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 107800
+          }
+        }
+      },
+      {
+        "itemNo": "15",
+        "description": "Furnish and install of 8 \" and 6 \" DR-MJ pipe and fittings between the pillows well unit pump house and the special feed lines from the wellhead system into these first 6 \" DR-MJ pipe system house via the pump house",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 31000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 56100
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 59750
+          }
+        }
+      },
+      {
+        "itemNo": "16",
+        "description": "Furnish and install of PVC C900 pipe and fittings from the elevated tower to the existing 6\" PVC pipe to the point indicated on the plans. Includes the installation of one (1) 6 x 6\" Tapping Sleeve and valve plus all fittings, hydrant, and miscellaneous work required by the Contract Documents. Emergency Standby Generator of the new Well No. 5 site. Permanent Set. Including all materials, concrete pad and conduit, manual transfer switch, underground electric to Turbine, testing, all miscellaneous work required by the Contract Documents to have a completed new services complete per the Contract Documents. Size of the generator shall be coordinated with the size of the new Well No. 4 pump (finally estimated to be a 50 HP pump, requiring approximately 75 KW of reserve power) plus miscellaneous electrical at the facility such as lights, power, etc. and shall be capable of operating the entire Well No. 5 facility. Generator shall allow either diesel fuel or natural gas as operating fuel, and shall be a minimum of 100 KW",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 110000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 96375
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 62100
+          }
+        }
+      },
+      {
+        "itemNo": "18",
+        "description": "Connect at the new well site complete, including the following furnish materials, grade, fuse, test, miscellaneous work as required to use these items, than the fencing and getting, parking bumpers and all other work as required to complete the site",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 70000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 106158
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 105200
+          }
+        }
+      },
+      {
+        "itemNo": "19",
+        "description": "Close measuring forms pumping minimum requirements for a Chlorinated Well No. 5 Pump - Per bid Furnish Plot of Facilities No. 1 Total",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 15000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 50700
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 88600
+          }
+        }
+      },
+      {
+        "itemNo": "a.",
+        "description": "The unit price per foot of 4\" pump column pipe or install the pump setting from Pot Basis Fuel cost - for additional power cable over 600'... Per Foot",
+        "sectionName": "SUPPLEMENTAL BID ITEMS",
+        "unit": "LF",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 0
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 99.87
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 41.78
+          }
+        },
+        "engineerEstimate": {
+          "extendedPrice": 3450
+        }
+      },
+      {
+        "itemNo": "b.",
+        "description": "The unit price per pump depot or to decrease the number of stages from the Base Bid Estimated. Per Pump Stage",
+        "sectionName": "SUPPLEMENTAL BID ITEMS",
+        "unit": "EA",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 270
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 315
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 715
+          }
+        }
+      },
+      {
+        "itemNo": "c.",
+        "description": "The unit price per 10 HP to increase or decrease the pump motor up to 6 50 HP or down to a 40 HP motor, including all electrical. Per 10 HP",
+        "sectionName": "SUPPLEMENTAL BID ITEMS",
+        "unit": "EA",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 750
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 982
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 2500
+          }
+        }
+      },
+      {
+        "itemNo": "14a",
+        "description": "Furnish materials and erect split face pump house masonry building complete including foundation, conduit in slab, 4\" discharge pipe to tower unit to distribution system, lighting, electric service, concrete floor and all miscellaneous building electrical, weatherproof, wiring conduit, ground and meter base, roof appurtenances, all miscellaneous doors, windows, finish work, painting, for a complete appurtenant facility",
+        "sectionName": "BID ALTERNATE CONTRACT NO. 1 BID ALTERNATE 14a SPLIT FACE PUMP HOUSE MASONRY BUILDING",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 130000
+          },
+          "Gene's Enterprises, Inc": {
+            "extendedPrice": 146375
+          },
+          "Martin General Contractors": {
+            "extendedPrice": 123200
+          }
+        }
+      }
+    ],
+    "totals": {
+      "A & B Equipment, LLC": 747221.7,
+      "Gene's Enterprises, Inc": 1063483,
+      "Martin General Contractors": 1913475
+    }
+  }
+}

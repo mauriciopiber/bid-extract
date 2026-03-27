@@ -1,0 +1,334 @@
+{
+  "layout": "bid_tabulation",
+  "sample": "S01",
+  "extractor": "E1",
+  "prompt": "PR1",
+  "run": 2,
+  "timestamp": "2026-03-27T00:09:00.385Z",
+  "durationMs": 40164,
+  "success": true,
+  "itemCount": 18,
+  "bidderCount": 3,
+  "data": {
+    "bidders": [
+      "A & B Equipment, LLC",
+      "Gerik Enterprises, Inc",
+      "Martin General Contracting"
+    ],
+    "items": [
+      {
+        "itemNo": "1",
+        "description": "Mobilization, Bonds and Insurance",
+        "sectionName": "SECTION NO. 1 - FIRST NOTICED PROCEED:",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 30000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 50000
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 107500
+          }
+        }
+      },
+      {
+        "itemNo": "2",
+        "description": "Drilling 6\" pilot hole below surface casing point to estimated total depth, including all till, piezometer and test holes",
+        "unit": "LF",
+        "quantity": 2720,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 68
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 78
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 150
+          }
+        }
+      },
+      {
+        "itemNo": "3",
+        "description": "Furnish and install 12\" test well casing from 2' above grade to set depth",
+        "sectionName": "SECTION NO. 2 - SECOND NOTICED PROCEED:",
+        "unit": "LF",
+        "quantity": 4,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 75
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 88.7
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 150
+          }
+        }
+      },
+      {
+        "itemNo": "4",
+        "description": "Furnish and install 12\" test well casing from 2' above grade to set depth",
+        "unit": "LF",
+        "quantity": 513,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 75
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 88.7
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 150
+          }
+        }
+      },
+      {
+        "itemNo": "5",
+        "description": "Furnish and install new 6\" potable well unit",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 16900
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 18379
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 29950
+          }
+        }
+      },
+      {
+        "itemNo": "6",
+        "description": "Test 1\" Schedule 40 PVC casing for yield and diameter cameras in this item",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 10000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 11750
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 15000
+          }
+        }
+      },
+      {
+        "itemNo": "7",
+        "description": "Supply and install well sterilization, 24 hour pump test, install test pump No. 1, remove",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 23625
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 27127
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 39500
+          }
+        }
+      },
+      {
+        "itemNo": "8",
+        "description": "Testing and install well head components are the new well and pump house record for the Emergency",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 64500
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 74175
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 89250
+          }
+        }
+      },
+      {
+        "itemNo": "9",
+        "description": "For an estimated setting of 600 feet including a 4\" diameter column pipe, via the DNP piping oil",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 64500
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 74175
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 89250
+          }
+        }
+      },
+      {
+        "itemNo": "10",
+        "description": "Joint and miscellaneous work as required by the plans and specifications for a complete, tested,",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 9000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 86300
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 196800
+          }
+        }
+      },
+      {
+        "itemNo": "11",
+        "description": "Furnish, erect and equip of electrical work at the new well and pump house record for the Emergency",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 7000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 20000
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 30000
+          }
+        }
+      },
+      {
+        "itemNo": "12",
+        "description": "Furnish and install pre (1) pump controller at the pump house, including pipe, fittings, electrical",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 56100
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 49128
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 52350
+          }
+        }
+      },
+      {
+        "itemNo": "13",
+        "description": "All pump house men the piping and control plumbing including fittings, flow meter, valves,",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 105500
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 133875
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 107850
+          }
+        }
+      },
+      {
+        "itemNo": "14",
+        "description": "Furnish materials and erect wooden frame and siding pump house building complete including",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 11000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 56100
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 59750
+          }
+        }
+      },
+      {
+        "itemNo": "15",
+        "description": "Furnish and install of 6\" and 8\" 'All Ages and fittings between the plates well with pump",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 11600
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 27300
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 26300
+          }
+        }
+      },
+      {
+        "itemNo": "16",
+        "description": "Furnish and install of PVC C900 pipe and fittings from the decelored tower to the existing 6\"",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 110000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 96375
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 62100
+          }
+        }
+      },
+      {
+        "itemNo": "17",
+        "description": "PVC pipe to the point indicated on the plans. Includes the installation of one 10\" 6\" 45° Tapping",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 70000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 156154
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 106200
+          }
+        }
+      },
+      {
+        "itemNo": "18",
+        "description": "Furnish all the new well site complete, including the following: furnish materials, grade lines,",
+        "unit": "LS",
+        "quantity": 1,
+        "bids": {
+          "A & B Equipment, LLC": {
+            "extendedPrice": 15000
+          },
+          "Gerik Enterprises, Inc": {
+            "extendedPrice": 50700
+          },
+          "Martin General Contracting": {
+            "extendedPrice": 88600
+          }
+        }
+      }
+    ],
+    "totals": {
+      "A & B Equipment, LLC": 747221.75,
+      "Gerik Enterprises, Inc": 1063483,
+      "Martin General Contracting": 1913475
+    }
+  }
+}
