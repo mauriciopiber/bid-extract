@@ -9,12 +9,18 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { compare } from "../lib/compare.js";
+import { toHierarchical } from "../../src/schemas/convert.js";
 
 const EVALS_DIR = join(import.meta.dirname, "..");
 
-function loadReference(sample: string): PageReference {
+function loadReference(sample: string) {
 	const path = join(EVALS_DIR, "reference", `${sample}.json`);
-	return JSON.parse(readFileSync(path, "utf-8"));
+	const raw = JSON.parse(readFileSync(path, "utf-8"));
+	// If reference is flat (has items[] not contracts[]), convert to hierarchical
+	if (raw.items && !raw.contracts) {
+		return { ...raw, ...toHierarchical(raw) };
+	}
+	return raw;
 }
 
 function loadResults(
@@ -94,36 +100,9 @@ async function main() {
 	console.log("-".repeat(90));
 
 	for (const result of results) {
-		// Convert flat run result to BidTabRef shape for comparison
-		// biome-ignore lint: dynamic eval data
-		const bidders = (result.data.bidders || []).map((b: any, i: number) =>
-			typeof b === "string" ? { rank: i + 1, name: b } : b,
-		);
-		const resultAsBidTab = {
-			bidders,
-			engineerEstimate: result.data.engineerEstimate,
-			contracts: result.data.items
-				? [
-						{
-							name: "Base Bid",
-							bidGroups: [
-								{
-									type: "base" as const,
-									name: "Base Bid",
-									sections: [
-										{
-											name: "",
-											items: result.data.items,
-										},
-									],
-									totals: result.data.totals,
-								},
-							],
-						},
-					]
-				: [],
-		};
-		const comparison = compare(reference, resultAsBidTab, sample);
+		// Convert flat run result to hierarchical using the standard function
+		const resultAsHier = toHierarchical(result.data as any);
+		const comparison = compare(reference, resultAsHier, sample);
 		const status = comparison.overallScore >= 90 ? "✓" : comparison.overallScore >= 70 ? "~" : "✗";
 
 		console.log(
