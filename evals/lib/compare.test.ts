@@ -159,6 +159,27 @@ describe("compare", () => {
 		expect(result.mathAccuracy).toBe(0);
 	});
 
+	it("lump sum: unitPrice = extendedPrice is valid math regardless of quantity", () => {
+		const item = {
+			...makeItem("1", { "A": { unitPrice: 30000, extendedPrice: 30000 } }, { unit: "FT", quantity: 700 }),
+			isLumpSum: true,
+		};
+		const data = simpleBidTab([item], [{ rank: 1, name: "A" }]);
+		const result = compare(data, data, "test");
+		expect(result.mathAccuracy).toBe(100);
+	});
+
+	it("non-lump-sum: unitPrice × quantity must equal extendedPrice", () => {
+		const ref = simpleBidTab([
+			makeItem("1", { "A": { unitPrice: 10, extendedPrice: 1000 } }, { unit: "FT", quantity: 100 }),
+		], [{ rank: 1, name: "A" }]);
+		const res = simpleBidTab([
+			makeItem("1", { "A": { unitPrice: 10, extendedPrice: 500 } }, { unit: "FT", quantity: 100 }),
+		], [{ rank: 1, name: "A" }]);
+		const result = compare(ref, res, "test");
+		expect(result.mathAccuracy).toBe(0);
+	});
+
 	it("handles empty contracts gracefully", () => {
 		const ref = { bidders: [], contracts: [] };
 		const res = { bidders: [], contracts: [] };

@@ -3,6 +3,15 @@
  * Both use the BidTabulation schema shape.
  */
 
+import type {
+	Item,
+	BidValue,
+	Section,
+	BidGroup,
+	Contract,
+	BidderInfo,
+} from "../../src/schemas/bid-tabulation.js";
+
 export interface ComparisonResult {
 	sample: string;
 	bidderAccuracy: number;
@@ -22,37 +31,9 @@ export interface ComparisonResult {
 	};
 }
 
-interface BidValue {
-	unitPrice?: number;
-	extendedPrice?: number;
-}
-
-interface Item {
-	itemNo: string | number;
-	description: string;
-	unit?: string;
-	quantity?: number;
-	bids: Record<string, BidValue>;
-	engineerEstimate?: BidValue;
-	subItems?: Item[];
-}
-
-interface Section {
-	name: string;
-	items: Item[];
-	subtotals?: Record<string, number>;
-}
-
-interface BidGroup {
-	type: string;
-	name: string;
-	sections: Section[];
-	totals?: Record<string, number>;
-}
-
 interface BidTabRef {
-	bidders: { rank: number; name: string; totalBaseBid?: number }[];
-	contracts: { name: string; bidGroups: BidGroup[] }[];
+	bidders: BidderInfo[];
+	contracts: Contract[];
 	engineerEstimate?: { total: number };
 }
 
@@ -179,11 +160,23 @@ export function compare(
 				}
 			}
 
-			// Math check
-			if (resBid.unitPrice != null && resItem.quantity != null && resBid.extendedPrice != null) {
+			// Math check — lump sum vs per-unit
+			if (resBid.unitPrice != null && resBid.extendedPrice != null) {
 				totalMath++;
-				const expected = Math.round(resBid.unitPrice * resItem.quantity * 100) / 100;
-				if (Math.abs(expected - resBid.extendedPrice) <= 1) {
+				const isLump = resItem.isLumpSum || refItem.isLumpSum;
+				if (isLump) {
+					// Lump sum: unitPrice must equal extendedPrice
+					if (Math.abs(resBid.unitPrice - resBid.extendedPrice) <= 1) {
+						correctMath++;
+					}
+				} else if (resItem.quantity != null) {
+					// Per-unit: unitPrice × quantity must equal extendedPrice
+					const expected = Math.round(resBid.unitPrice * resItem.quantity * 100) / 100;
+					if (Math.abs(expected - resBid.extendedPrice) <= 1) {
+						correctMath++;
+					}
+				} else {
+					// No quantity, can't check — pass
 					correctMath++;
 				}
 			}
