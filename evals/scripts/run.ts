@@ -90,6 +90,37 @@ Rules:
 - Set sectionName from any visible section headers
 - Include supplemental items and alternates if visible on this page`,
 	},
+	PR3: {
+		id: "PR3",
+		text: `Extract ALL bid tabulation data from this page.
+
+This is a bid tabulation document. It shows line items with quantities and prices from multiple bidders.
+
+IMPORTANT — Engineer's Estimate:
+- The "Engineer's Estimate" or "Engineer's Opinion of Cost" column is NOT a bidder
+- Do NOT include it in the bidders array
+- Extract it into the engineerEstimate field on each item: {"unitPrice": N, "extendedPrice": N}
+- Look for a TOTAL row for the engineer's estimate (e.g., "LS $150,000" or "Total Bid $150,000")
+- You MUST set the top-level engineerEstimate: {"total": N} with that total amount from the total row
+
+IMPORTANT — Bidder Totals:
+- Look for a "Total Bid" or "Total Base Bid" row at the bottom of the table
+- For each bidder, set totalBaseBid to their total from that row
+- Every bidder MUST have totalBaseBid if a total row is visible
+
+IMPORTANT — Lump Sum:
+- When unitPrice equals extendedPrice regardless of quantity, set isLumpSum: true
+- This is common — the bidder gives a flat price for the entire item
+
+Rules:
+- Identify ALL bidder names from column headers (NOT the engineer's estimate)
+- Extract EVERY numbered line item row — do NOT stop early
+- For each bid, use object format: {"unitPrice": N, "extendedPrice": N}
+- Only set unitPrice if explicitly shown as a separate column value
+- All monetary values as numbers (no $ signs, no commas)
+- Set sectionName from any visible section headers
+- Include supplemental items and alternates if visible on this page`,
+	},
 };
 
 // Schema imported from src/schemas/zod.ts — single source of truth
@@ -159,6 +190,7 @@ async function runExtraction(
 				bidders: object.bidders,
 				items: object.items,
 				totals: object.totals,
+				engineerEstimate: object.engineerEstimate,
 			},
 		};
 	} catch (err) {

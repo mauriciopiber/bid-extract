@@ -79,8 +79,10 @@ export const PageExtractionSchema = z.object({
 			engineerEstimate: BidValueSchema.optional(),
 		}),
 	),
-	totals: z.record(z.string(), z.number()).optional(),
-	engineerEstimate: z.object({ total: z.number() }).optional(),
+	totals: z.record(z.string(), z.number()).optional().describe("Total bid amount per bidder from the Total row"),
+	engineerEstimate: z.object({
+		total: z.number().describe("The engineer's estimate total from the Total row"),
+	}).optional().describe("Engineer's estimate total — read from the Total Bid row of the engineer's estimate column"),
 	continuedFromPrevious: z.boolean(),
 	continuedOnNext: z.boolean(),
 });
