@@ -119,6 +119,8 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 
 11. **NO REFERENCE WITHOUT HUMAN REVIEW.** Ground truth is ONLY valid after a human has verified every value against the PDF. A reference file created by code or LLM is a DRAFT — it cannot be used for scoring until marked as `"verified": true` by a human. Eval scores against unverified references are meaningless.
 
+12. **CLASSIFY FIRST, THEN EXTRACT.** Different page types need different prompts and schemas. Never send a bid ranking to a bid tabulation prompt. Always: classify → route → extract → validate per type. (Currently focused on bid_tabulation extraction. Other types will need their own prompt + eval track.)
+
 ## Development Rules
 
 - **ONE SOURCE OF TRUTH FOR TYPES.** Zod schemas live in `src/schemas/`. TypeScript types are inferred from Zod with `z.infer<>`. NEVER duplicate type definitions. NEVER define types or schemas in scripts, evals, UI, or anywhere else. Always import from `src/schemas/`.
