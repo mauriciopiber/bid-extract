@@ -108,15 +108,17 @@ IMPORTANT — Bidder Totals:
 - For each bidder, set totalBaseBid to their total from that row
 - Every bidder MUST have totalBaseBid if a total row is visible
 
-IMPORTANT — Lump Sum:
-- When unitPrice equals extendedPrice regardless of quantity, set isLumpSum: true
-- This is common — the bidder gives a flat price for the entire item
+IMPORTANT — Lump Sum Detection:
+- When the UNIT PRICE column and EXTENDED PRICE column show the SAME value for an item, it is lump sum. Set isLumpSum: true.
+- This happens even when quantity > 1. Example: qty=700, unitPrice=$30,000, extendedPrice=$30,000 → this is lump sum ($30,000 flat total), NOT $30,000 per unit.
+- NEVER divide the extended price by quantity to get a unit price. If the document shows $30,000 in the unit price column, use $30,000 — do not convert it to $42.86.
+- When isLumpSum is true, unitPrice and extendedPrice MUST be the same number.
 
 Rules:
 - Identify ALL bidder names from column headers (NOT the engineer's estimate)
 - Extract EVERY numbered line item row — do NOT stop early
 - For each bid, use object format: {"unitPrice": N, "extendedPrice": N}
-- Only set unitPrice if explicitly shown as a separate column value
+- Read the UNIT PRICE and EXTENDED PRICE columns separately — copy each value as shown
 - All monetary values as numbers (no $ signs, no commas)
 - Set sectionName from any visible section headers
 - Include supplemental items and alternates if visible on this page`,
