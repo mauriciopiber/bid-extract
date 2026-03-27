@@ -117,6 +117,8 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 
 10. **THE UI IS THE SOURCE OF TRUTH.** If data exists in the DB but doesn't show in the UI, it doesn't exist. Every pipeline change MUST flow through to the UI. Every claim ("totals are present") MUST be verified by checking the UI, not just the DB. Add Playwright tests for every data point that matters. If the UI can't show it, the feature is not done.
 
+11. **NO REFERENCE WITHOUT HUMAN REVIEW.** Ground truth is ONLY valid after a human has verified every value against the PDF. A reference file created by code or LLM is a DRAFT — it cannot be used for scoring until marked as `"verified": true` by a human. Eval scores against unverified references are meaningless.
+
 ## Testing
 
 - **Unit tests** (vitest): validator, math reporter, JSON parser, DB schema — `npx vitest run`

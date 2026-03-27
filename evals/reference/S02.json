@@ -1,4 +1,7 @@
 {
+  "verified": false,
+  "verifiedBy": null,
+  "verifiedAt": null,
   "layout": "bid_tabulation",
   "sample": "S02",
   "pdfFile": "Bid_Results_Andrew_Bridge_2350005.pdf",

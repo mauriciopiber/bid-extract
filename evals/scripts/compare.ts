@@ -66,6 +66,14 @@ async function main() {
 	console.log(`\n=== Comparison: ${sample} ===\n`);
 
 	const reference = loadReference(sample);
+
+	const refAny = reference as Record<string, unknown>;
+	if (!refAny.verified) {
+		console.log("⚠ WARNING: Reference is NOT human-verified. Scores are unreliable.\n");
+	} else {
+		console.log(`✓ Verified by ${refAny.verifiedBy} on ${refAny.verifiedAt}\n`);
+	}
+
 	console.log(
 		`Reference: ${reference.items.length} items, ${reference.bidders.length} bidders\n`,
 	);
