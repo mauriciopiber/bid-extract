@@ -119,6 +119,25 @@ BidderInfo { rank, name, totalBaseBid?, address? }
 
 11. **NO REFERENCE WITHOUT HUMAN REVIEW.** Ground truth is ONLY valid after a human has verified every value against the PDF. A reference file created by code or LLM is a DRAFT — it cannot be used for scoring until marked as `"verified": true` by a human. Eval scores against unverified references are meaningless.
 
+## Action Words
+
+When the user says these words, do exactly this:
+
+- **"human review"** or **"review"** → Open the image file (so the user can see it) AND open the JSON in VS Code. Then WAIT for the user's response. Do not proceed until the user says OK or gives corrections. Then iterate.
+  ```bash
+  open evals/samples/S02.png
+  code evals/reference/S02.json
+  ```
+  Then print the summary and STOP. Wait for feedback.
+
+- **"verify"** → Run `npx tsx evals/scripts/verify.ts --sample=SXX --by=mauricio`
+
+- **"run eval"** → Run extraction + compare: `npx tsx evals/scripts/run.ts --sample=SXX` then `npx tsx evals/scripts/compare.ts --sample=SXX`
+
+- **"generate reference"** → Run `npx tsx evals/scripts/generate-reference.ts --sample=SXX`
+
+- **"reset"** → Run `npx tsx src/cli.ts reset`
+
 ## Testing
 
 - **Unit tests** (vitest): validator, math reporter, JSON parser, DB schema — `npx vitest run`
