@@ -8,8 +8,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { compareToReference } from "../lib/compare.js";
-import type { PageReference, RunResult } from "../lib/types.js";
+import { compare } from "../lib/compare.js";
 
 const EVALS_DIR = join(import.meta.dirname, "..");
 
@@ -74,8 +73,12 @@ async function main() {
 		console.log(`✓ Verified by ${refAny.verifiedBy} on ${refAny.verifiedAt}\n`);
 	}
 
+	const refItemCount = (reference.contracts || []).reduce(
+		(sum: number, c: any) => sum + c.bidGroups.reduce(
+			(gs: number, g: any) => gs + g.sections.reduce(
+				(ss: number, s: any) => ss + s.items.length, 0), 0), 0);
 	console.log(
-		`Reference: ${reference.items.length} items, ${reference.bidders.length} bidders\n`,
+		`Reference: ${refItemCount} items, ${reference.bidders.length} bidders\n`,
 	);
 
 	const results = loadResults(sample, params.extractor, params.prompt);
@@ -91,20 +94,47 @@ async function main() {
 	console.log("-".repeat(90));
 
 	for (const result of results) {
-		const comparison = compareToReference(reference, result);
+		// Convert flat run result to BidTabRef shape for comparison
+		const resultAsBidTab = {
+			bidders: (result.data.bidders || []).map((name: string, i: number) => ({
+				rank: i + 1,
+				name,
+			})),
+			contracts: result.data.items
+				? [
+						{
+							name: "Base Bid",
+							bidGroups: [
+								{
+									type: "base",
+									name: "Base Bid",
+									sections: [
+										{
+											name: "",
+											items: result.data.items,
+										},
+									],
+									totals: result.data.totals,
+								},
+							],
+						},
+					]
+				: [],
+		};
+		const comparison = compare(reference, resultAsBidTab, sample);
 		const status = comparison.overallScore >= 90 ? "✓" : comparison.overallScore >= 70 ? "~" : "✗";
 
 		console.log(
-			`${comparison.extractor.padEnd(10)} ${comparison.prompt.padEnd(8)} ${String(comparison.run).padEnd(5)} ${`${comparison.details.matchedItems}/${comparison.details.expectedItems}`.padEnd(8)} ${`${comparison.itemAccuracy}%`.padEnd(7)} ${`${comparison.fieldAccuracy}%`.padEnd(8)} ${`${comparison.mathAccuracy}%`.padEnd(7)} ${`${comparison.bidderAccuracy}%`.padEnd(9)} ${`${comparison.totalAccuracy}%`.padEnd(8)} ${`${comparison.overallScore}%`.padEnd(8)} ${status}`,
+			`${(result.extractor || "?").padEnd(10)} ${(result.prompt || "?").padEnd(8)} ${String(result.run || "?").padEnd(5)} ${`${comparison.details.matchedItems}/${comparison.details.expectedItems}`.padEnd(8)} ${`${comparison.itemAccuracy}%`.padEnd(7)} ${`${comparison.fieldAccuracy}%`.padEnd(8)} ${`${comparison.mathAccuracy}%`.padEnd(7)} ${`${comparison.bidderAccuracy}%`.padEnd(9)} ${`${comparison.totalAccuracy}%`.padEnd(8)} ${`${comparison.overallScore}%`.padEnd(8)} ${status}`,
 		);
 
-		if (comparison.details.fieldErrors.length > 0 && comparison.details.fieldErrors.length <= 5) {
-			for (const err of comparison.details.fieldErrors) {
+		if (comparison.details.errors.length > 0 && comparison.details.errors.length <= 5) {
+			for (const err of comparison.details.errors) {
 				console.log(`  ⚠ ${err}`);
 			}
-		} else if (comparison.details.fieldErrors.length > 5) {
-			console.log(`  ⚠ ${comparison.details.fieldErrors.length} field errors (showing first 3)`);
-			for (const err of comparison.details.fieldErrors.slice(0, 3)) {
+		} else if (comparison.details.errors.length > 5) {
+			console.log(`  ⚠ ${comparison.details.errors.length} field errors (showing first 3)`);
+			for (const err of comparison.details.errors.slice(0, 3)) {
 				console.log(`    ${err}`);
 			}
 		}

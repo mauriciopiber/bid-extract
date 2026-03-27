@@ -1,7 +1,7 @@
 {
-  "verified": false,
-  "verifiedBy": null,
-  "verifiedAt": null,
+  "verified": true,
+  "verifiedBy": "mauricio",
+  "verifiedAt": "2026-03-27",
   "sample": "S02",
   "pdfFile": "Bid_Results_Andrew_Bridge_2350005.pdf",
   "pageNumber": 1,
@@ -25,6 +25,7 @@
                 {
                   "itemNo": "1",
                   "description": "MOBILIZATION",
+                  "isLumpSum": true,
                   "bids": {
                     "C&C BRIDGE & CONCRETE, INC": {
                       "unitPrice": 50000,
@@ -41,6 +42,7 @@
                   "description": "DRIVING H-PILE",
                   "unit": "FT",
                   "quantity": 700,
+                  "isLumpSum": true,
                   "bids": {
                     "C&C BRIDGE & CONCRETE, INC": {
                       "unitPrice": 30000,
@@ -57,6 +59,7 @@
                   "description": "DRIVING SHEET PILE",
                   "unit": "SF",
                   "quantity": 2520,
+                  "isLumpSum": true,
                   "bids": {
                     "C&C BRIDGE & CONCRETE, INC": {
                       "unitPrice": 40000,
@@ -71,6 +74,7 @@
                 {
                   "itemNo": "4",
                   "description": "CONSTRUCT CAPS & SET BEAMS",
+                  "isLumpSum": true,
                   "bids": {
                     "C&C BRIDGE & CONCRETE, INC": {
                       "unitPrice": 42000,

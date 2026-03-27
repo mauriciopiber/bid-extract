@@ -10,7 +10,7 @@ export default defineConfig({
     },
     setupFiles: ["dotenv/config"],
     exclude: ["**/node_modules/**", "**/ui/**", "**/test-results/**"],
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "evals/**/*.test.ts"],
   },
   resolve: {
     alias: {
